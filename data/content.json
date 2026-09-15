@@ -152,11 +152,15 @@
     "itemsWeight": 400,
     "showQr": true,
     "qrUrl": "assets/qr-1004house.png",
-    "qrCaption": "QR코드를 스캔하면\n1004보금자리 홈페이지로 이동합니다"
+    "qrCaption": "QR코드를 스캔하면\n1004보금자리 홈페이지로 이동합니다",
+    "qrPosition": "bottom-right"
   },
   "site": {
     "wordmarkText": "1004보금자리",
-    "wordmarkImg": ""
+    "wordmarkImg": "",
+    "wordmarkTextSize": 2,
+    "wordmarkTextWeight": 700,
+    "wordmarkImgHeight": 2.4
   },
   "theme": {
     "transitionType": "zoom",
