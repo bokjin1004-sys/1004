@@ -47,7 +47,12 @@
   .grid5 .card .desc{margin-top:.8vh;font-size:.85vw;color:#c7dfe4;line-height:1.5;}
   .contact-line{margin-top:3vh;font-size:1.15vw;color:#d6ecf0;display:flex;gap:2.4vw;justify-content:center;flex-wrap:wrap;}
   #topbar{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:3.4vh 3vw 0;pointer-events:none;}
-  #wordmark{color:var(--paper);font-family:'Noto Serif KR',serif;font-weight:700;font-size:1.3vw;text-shadow:0 2px 10px rgba(0,0,0,.4);opacity:.92;}
+  #wordmark{color:var(--paper);font-family:'Noto Serif KR',serif;font-weight:700;font-size:1.3vw;text-shadow:0 2px 10px rgba(0,0,0,.4);opacity:.92;display:flex;align-items:center;}
+  #wordmark img{height:2.4vw;max-width:16vw;object-fit:contain;display:block;}
+  .qr-box{position:absolute;right:6vw;bottom:6vh;z-index:3;display:flex;flex-direction:column;align-items:center;gap:.8vh;}
+  .qr-box .qr-card{background:#fff;border-radius:12px;padding:.7vw;box-shadow:0 6px 24px rgba(0,0,0,.35);}
+  .qr-box .qr-card img{display:block;width:8vw;height:8vw;}
+  .qr-box .qr-caption{color:var(--paper);font-size:.9vw;opacity:.85;text-align:center;}
   #dots{display:flex;gap:.55vw;}
   .dot{width:1.6vw;height:4px;border-radius:2px;background:rgba(255,255,255,.28);overflow:hidden;position:relative;}
   .dot .fill{position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;}
@@ -212,6 +217,17 @@
 
     <div class="card-ed" style="align-items:center;">
       <div class="fields">
+        <label style="font-size:13px; color:#e9f4f6; font-weight:700; margin-bottom:8px;">🏷️ 왼쪽 상단 로고 (모든 화면에 항상 표시)</label>
+        <div class="row2">
+          <div><label>로고 문구</label><input type="text" id="wordmarkText" placeholder="1004보금자리"></div>
+          <div><label>로고 이미지 주소(URL, 비우면 문구만 표시)</label><input type="text" id="wordmarkImg" placeholder="https://... 또는 파일 선택 이용"></div>
+        </div>
+        <div class="filepick"><input type="file" accept="image/*" id="wordmarkFile"></div>
+      </div>
+    </div>
+
+    <div class="card-ed" style="align-items:center;">
+      <div class="fields">
         <label style="font-size:13px; color:#e9f4f6; font-weight:700; margin-bottom:8px;">☁️ GitHub 연동 (누구나 접속하면 최신 내용이 자동으로 보임)</label>
         <div class="hint" style="margin-bottom:10px;">
           저장소 정보는 이 프로젝트 것으로 이미 채워져 있어요. 페이지를 여는 모든 사람은 <b>토큰 없이도</b>
@@ -349,7 +365,8 @@
     items: ['☎ 061-275-0767', '전남 신안군 압해읍 구항길 92-76', '1004house.co.kr'],
     eyebrowSize: 1.1, eyebrowWeight: 700,
     titleSize: 3.8, titleWeight: 700,
-    itemsSize: 1.15, itemsWeight: 400
+    itemsSize: 1.15, itemsWeight: 400,
+    showQr: true, qrUrl: 'assets/qr-1004house.png', qrCaption: 'QR코드를 스캔하면\n1004보금자리 홈페이지로 이동합니다'
   };
   function loadContact(){
     try{ const raw = localStorage.getItem(CONTACT_KEY); if(raw) return Object.assign({}, DEFAULT_CONTACT, JSON.parse(raw)); }catch(e){}
@@ -357,6 +374,15 @@
   }
   function saveContact(d){ localStorage.setItem(CONTACT_KEY, JSON.stringify(d)); }
   let contactData = loadContact();
+
+  const SITE_KEY = '1004house_promo_site_v1';
+  const DEFAULT_SITE = { wordmarkText: '1004보금자리', wordmarkImg: '' };
+  function loadSite(){
+    try{ const raw = localStorage.getItem(SITE_KEY); if(raw) return Object.assign({}, DEFAULT_SITE, JSON.parse(raw)); }catch(e){}
+    return JSON.parse(JSON.stringify(DEFAULT_SITE));
+  }
+  function saveSite(d){ localStorage.setItem(SITE_KEY, JSON.stringify(d)); }
+  let siteData = loadSite();
 
   const THEME_KEY = '1004house_promo_theme_v2';
   const DEFAULT_THEME = { transitionType: 'fade', transitionSpeed: 1.4 };
@@ -550,10 +576,31 @@
       <h1 style="line-height:${1.45*ls};font-size:${contactData.titleSize||3.8}vw;font-weight:${contactData.titleWeight||700};">${titleHtml}</h1>
       <div class="contact-line" style="font-size:${contactData.itemsSize||1.15}vw;font-weight:${contactData.itemsWeight||400};">${itemsHtml}</div>
     `;
+    let qrBox = el.querySelector('.qr-box');
+    if(contactData.showQr && contactData.qrUrl){
+      if(!qrBox){ qrBox = document.createElement('div'); qrBox.className = 'qr-box'; el.appendChild(qrBox); }
+      const captionHtml = (contactData.qrCaption||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
+      qrBox.innerHTML = `
+        <div class="qr-card"><img src="${escapeAttr(contactData.qrUrl)}" alt="QR"></div>
+        <div class="qr-caption">${captionHtml}</div>
+      `;
+    } else if(qrBox){
+      qrBox.remove();
+    }
+  }
+
+  function renderWordmark(){
+    const el = document.getElementById('wordmark');
+    if(siteData.wordmarkImg){
+      el.innerHTML = `<img src="${escapeAttr(siteData.wordmarkImg)}" alt="${escapeAttr(siteData.wordmarkText||'')}">`;
+    } else {
+      el.textContent = siteData.wordmarkText || '';
+    }
   }
 
   function buildPlaybackDom(){
     deckOrder = sanitizeDeck(deckOrder);
+    renderWordmark();
     renderIntroDom();
     renderServicesDom();
     renderContactDom();
@@ -697,6 +744,28 @@
   themeTransType.addEventListener('input', ()=>{ theme.transitionType = themeTransType.value; saveTheme(theme); applyTheme(theme); });
   themeTransSpeed.addEventListener('input', ()=>{ theme.transitionSpeed = Number(themeTransSpeed.value)||1.4; saveTheme(theme); applyTheme(theme); });
 
+  const wordmarkTextInput = document.getElementById('wordmarkText');
+  const wordmarkImgInput = document.getElementById('wordmarkImg');
+  const wordmarkFileInput = document.getElementById('wordmarkFile');
+  function syncWordmarkInputs(){
+    wordmarkTextInput.value = siteData.wordmarkText || '';
+    wordmarkImgInput.value = siteData.wordmarkImg || '';
+  }
+  syncWordmarkInputs();
+  wordmarkTextInput.addEventListener('input', ()=>{ siteData.wordmarkText = wordmarkTextInput.value; saveSite(siteData); renderWordmark(); });
+  wordmarkImgInput.addEventListener('input', ()=>{ siteData.wordmarkImg = wordmarkImgInput.value; saveSite(siteData); renderWordmark(); });
+  wordmarkFileInput.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    loadImageForUpload(file).then(dataUrl=>{
+      siteData.wordmarkImg = dataUrl;
+      wordmarkImgInput.value = dataUrl;
+      saveSite(siteData);
+      renderWordmark();
+      toast('로고 이미지가 반영됐어요');
+    });
+  });
+
   const POSITIONS = [
     ['top-left','위쪽·왼쪽'], ['top-center','위쪽·가운데'], ['top-right','위쪽·오른쪽'],
     ['middle-left','가운데·왼쪽'], ['middle-center','가운데·가운데'], ['middle-right','가운데·오른쪽'],
@@ -708,6 +777,7 @@
     saveIntro(introData);
     saveServices(servicesData);
     saveContact(contactData);
+    saveSite(siteData);
     deckOrder = sanitizeDeck(deckOrder);
     saveDeck(deckOrder);
     renderDeckEditor();
@@ -837,6 +907,43 @@
           data[f] = inp.value;
           persistFn(true);
         });
+      }
+    });
+  }
+
+  function qrFieldsHtml(data){
+    return `
+      <div class="subhead">QR 코드</div>
+      <div class="row2">
+        <div><label>표시 여부</label>
+          <select data-qf="showQr">
+            <option value="1" ${data.showQr!==false?'selected':''}>표시함</option>
+            <option value="0" ${data.showQr===false?'selected':''}>표시 안 함</option>
+          </select>
+        </div>
+        <div></div>
+      </div>
+      <div><label>QR 이미지 주소(URL)</label><input type="text" data-qf="qrUrl" value="${escapeAttr(data.qrUrl||'')}" placeholder="assets/qr-1004house.png 또는 파일 선택 이용"></div>
+      <div class="filepick"><input type="file" accept="image/*" data-qf="qrFile"></div>
+      <div><label>QR 아래 안내 문구 (줄바꿈은 그대로 반영돼요)</label><textarea data-qf="qrCaption" rows="2">${escapeHtml(data.qrCaption||'')}</textarea></div>
+    `;
+  }
+  function bindQrFields(container, data, persistFn){
+    container.querySelectorAll('[data-qf]').forEach(inp=>{
+      const f = inp.dataset.qf;
+      if(f==='qrFile'){
+        inp.addEventListener('change', (e)=>{
+          const file = e.target.files[0];
+          if(!file) return;
+          loadImageForUpload(file).then(dataUrl=>{
+            data.qrUrl = dataUrl;
+            persistFn();
+          });
+        });
+      } else if(f==='showQr'){
+        inp.addEventListener('input', ()=>{ data.showQr = inp.value==='1'; persistFn(true); });
+      } else {
+        inp.addEventListener('input', ()=>{ data[f] = inp.value; persistFn(true); });
       }
     });
   }
@@ -986,6 +1093,7 @@
           ${textStyleFieldHtml('제목', contactData, 'titleSize', 'titleWeight', 3.8, 700, 1.5, 6)}
           <div class="subhead">연락처 항목 글씨</div>
           ${textStyleFieldHtml('항목', contactData, 'itemsSize', 'itemsWeight', 1.15, 400, 0.5, 3)}
+          ${qrFieldsHtml(contactData)}
           ${bgFieldsHtml(contactData)}
         `;
         body.querySelectorAll('[data-f]').forEach(inp=>{
@@ -996,6 +1104,7 @@
         bindPosField(body, contactData, persistAll);
         bindLineSpacingField(body, contactData, persistAll);
         bindTextStyleFields(body, contactData, persistAll);
+        bindQrFields(body, contactData, persistAll);
         bindBgFields(body, contactData, persistAll);
         const itemsWrap = body.querySelector(`#ctItems_${i}`);
         (contactData.items||[]).forEach((v, vi)=>{
@@ -1127,16 +1236,18 @@
       introData = JSON.parse(JSON.stringify(DEFAULT_INTRO));
       servicesData = JSON.parse(JSON.stringify(DEFAULT_SERVICES));
       contactData = JSON.parse(JSON.stringify(DEFAULT_CONTACT));
+      siteData = JSON.parse(JSON.stringify(DEFAULT_SITE));
       theme = Object.assign({}, DEFAULT_THEME);
       deckOrder = defaultDeckOrder();
       saveTheme(theme); applyTheme(theme);
       themeTransType.value = theme.transitionType; themeTransSpeed.value = theme.transitionSpeed;
+      syncWordmarkInputs();
       persistAll();
     }
   });
 
   function buildBackupObject(){
-    return { slides: slidesData, intro: introData, services: servicesData, contact: contactData, theme: theme, deck: deckOrder };
+    return { slides: slidesData, intro: introData, services: servicesData, contact: contactData, site: siteData, theme: theme, deck: deckOrder };
   }
 
   function applyBackupData(parsed){
@@ -1154,6 +1265,7 @@
       if(parsed.intro) introData = Object.assign({}, DEFAULT_INTRO, parsed.intro);
       if(parsed.services) servicesData = Object.assign({}, DEFAULT_SERVICES, parsed.services);
       if(parsed.contact) contactData = Object.assign({}, DEFAULT_CONTACT, parsed.contact);
+      if(parsed.site){ siteData = Object.assign({}, DEFAULT_SITE, parsed.site); syncWordmarkInputs(); }
       if(parsed.theme){
         theme = Object.assign({}, DEFAULT_THEME, parsed.theme); saveTheme(theme); applyTheme(theme);
         themeTransType.value = theme.transitionType; themeTransSpeed.value = theme.transitionSpeed;
@@ -1372,6 +1484,28 @@
       ctx.fillStyle = '#d6ecf0'; ctx.font = `${item.subWeight||400} ${subPx}px "Noto Sans KR", sans-serif`;
       subLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += subLH; });
     }
+
+    if(item.showQr && item.qrImgEl){
+      const qrSize = W*0.08, pad = W*0.007;
+      const cardSize = qrSize + pad*2;
+      const capLines = (item.qrCaption||'').split('\n').filter(Boolean);
+      const capFont = W*0.009, capLH = capFont*1.4;
+      const capBlockH = capLines.length ? (capLines.length*capLH + 8) : 0;
+      const cardLeft = W - W*0.06 - cardSize;
+      const cardTop = H - H*0.06 - capBlockH - cardSize;
+
+      ctx.fillStyle = '#ffffff';
+      roundRect(ctx, cardLeft, cardTop, cardSize, cardSize, 12); ctx.fill();
+      ctx.drawImage(item.qrImgEl, cardLeft+pad, cardTop+pad, qrSize, qrSize);
+
+      if(capLines.length){
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#e9f4f6';
+        ctx.font = `400 ${capFont}px "Noto Sans KR", sans-serif`;
+        let capY = cardTop + cardSize + 8 + capFont*0.85;
+        capLines.forEach(line=>{ ctx.fillText(line, cardLeft+cardSize/2, capY); capY += capLH; });
+      }
+    }
   }
 
   function drawServicesSlide(ctx,W,H,item){
@@ -1524,7 +1658,8 @@
           subLines: [(contactData.items||[]).join('      ')], durMs: (Number(contactData.dur)||7)*1000,
           eyebrowSize: contactData.eyebrowSize||1.1, eyebrowWeight: contactData.eyebrowWeight||700,
           titleSize: contactData.titleSize||3.8, titleWeight: contactData.titleWeight||700,
-          subSize: contactData.itemsSize||1.15, subWeight: contactData.itemsWeight||400
+          subSize: contactData.itemsSize||1.15, subWeight: contactData.itemsWeight||400,
+          showQr: contactData.showQr!==false, qrUrl: contactData.qrUrl||'', qrCaption: contactData.qrCaption||''
         };
       }
       const s = slidesData.find(x=>x.id===tok);
@@ -1577,6 +1712,9 @@
         if(url){
           item.imgEl = await loadImageSafe(url);
           if(!item.imgEl) failed.push((item.title||item.titleLines&&item.titleLines[0]||'사진').toString().split('\n')[0]);
+        }
+        if(item.showQr && item.qrUrl){
+          item.qrImgEl = await loadImageSafe(item.qrUrl);
         }
       }
 
