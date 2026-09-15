@@ -320,7 +320,12 @@
     eyebrow: '서비스 안내',
     title: '거주인의 요구에 부합한\n다섯 가지 서비스',
     dur: 8, bgType: 'color', bgColor: '#123b52', bgImg: '', position: 'middle-center', lineSpacing: 1,
+    eyebrowSize: 1.1, eyebrowWeight: 700,
+    titleSize: 2.5, titleWeight: 700,
     cardAlign: 'left', cardScale: 1,
+    numSize: 1.6, numWeight: 700,
+    nameSize: 1.15, nameWeight: 700,
+    descSize: 0.85, descWeight: 400,
     cards: [
       {num:'01', name:'서비스지원팀', desc:'개별화·일상생활·문화여가·가족연계 지원'},
       {num:'02', name:'건강지원팀', desc:'정기 건강검진과 맞춤 치료 연계'},
@@ -514,16 +519,19 @@
     const titleHtml = (servicesData.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
     const cardAlign = servicesData.cardAlign || 'left';
     const cardScale = servicesData.cardScale || 1;
+    const numSize = (servicesData.numSize||1.6)*cardScale;
+    const nameSize = (servicesData.nameSize||1.15)*cardScale;
+    const descSize = (servicesData.descSize||0.85)*cardScale;
     const cardsHtml = (servicesData.cards||[]).map(c=>`
       <div class="card" style="text-align:${cardAlign};padding:${1.6*cardScale}vw ${1.3*cardScale}vw;">
-        <div class="num" style="font-size:${1.6*cardScale}vw;">${escapeHtml(c.num||'')}</div>
-        <div class="name" style="font-size:${1.15*cardScale}vw;">${escapeHtml(c.name||'')}</div>
-        <div class="desc" style="font-size:${0.85*cardScale}vw;">${escapeHtml(c.desc||'')}</div>
+        <div class="num" style="font-size:${numSize}vw;font-weight:${servicesData.numWeight||700};">${escapeHtml(c.num||'')}</div>
+        <div class="name" style="font-size:${nameSize}vw;font-weight:${servicesData.nameWeight||700};">${escapeHtml(c.name||'')}</div>
+        <div class="desc" style="font-size:${descSize}vw;font-weight:${servicesData.descWeight||400};">${escapeHtml(c.desc||'')}</div>
       </div>
     `).join('');
     inner.innerHTML = `
-      <div class="eyebrow" style="line-height:${1.3*ls};">${escapeHtml(servicesData.eyebrow||'')}</div>
-      <h1 style="font-size:2.5vw;line-height:${1.45*ls};">${titleHtml}</h1>
+      <div class="eyebrow" style="line-height:${1.3*ls};font-size:${servicesData.eyebrowSize||1.1}vw;font-weight:${servicesData.eyebrowWeight||700};">${escapeHtml(servicesData.eyebrow||'')}</div>
+      <h1 style="line-height:${1.45*ls};font-size:${servicesData.titleSize||2.5}vw;font-weight:${servicesData.titleWeight||700};">${titleHtml}</h1>
       <div class="grid5" style="margin-top:4vh;">${cardsHtml}</div>
     `;
   }
@@ -776,6 +784,12 @@
         </div>
         <div><label>상자 크기</label><input type="number" data-cardstyle="cardScale" min="0.6" max="1.8" step="0.05" value="${scale}"></div>
       </div>
+      <div class="subhead">카드 안 번호 글씨</div>
+      ${textStyleFieldHtml('번호', data, 'numSize', 'numWeight', 1.6, 700, 0.6, 3)}
+      <div class="subhead">카드 안 팀 이름 글씨</div>
+      ${textStyleFieldHtml('팀 이름', data, 'nameSize', 'nameWeight', 1.15, 700, 0.6, 3)}
+      <div class="subhead">카드 안 설명 글씨</div>
+      ${textStyleFieldHtml('설명', data, 'descSize', 'descWeight', 0.85, 400, 0.4, 2)}
     `;
   }
   function bindServiceCardFields(container, data, persistFn){
@@ -905,6 +919,10 @@
             <div><label>노출 시간(초)</label><input type="number" data-f="dur" min="2" max="60" value="${servicesData.dur||8}"></div>
           </div>
           <div><label>제목 (줄바꿈은 그대로 반영돼요)</label><textarea data-f="title" rows="2">${escapeHtml(servicesData.title||'')}</textarea></div>
+          <div class="subhead">라벨 글씨</div>
+          ${textStyleFieldHtml('라벨', servicesData, 'eyebrowSize', 'eyebrowWeight', 1.1, 700, 0.5, 3)}
+          <div class="subhead">제목 글씨</div>
+          ${textStyleFieldHtml('제목', servicesData, 'titleSize', 'titleWeight', 2.5, 700, 1.2, 5)}
           <div id="svcCards_${i}" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
           <button class="btn small ghost" data-act="addCard" style="margin-top:10px; width:fit-content;">+ 카드 추가</button>
           ${serviceCardFieldsHtml(servicesData)}
@@ -917,6 +935,7 @@
           inp.addEventListener('input', ()=>{ servicesData[f] = f==='dur' ? (Number(inp.value)||8) : inp.value; saveServices(servicesData); });
           inp.addEventListener('blur', ()=> persistAll(true));
         });
+        bindTextStyleFields(body, servicesData, persistAll);
         bindServiceCardFields(body, servicesData, persistAll);
         bindPosField(body, servicesData, persistAll);
         bindLineSpacingField(body, servicesData, persistAll);
@@ -1362,7 +1381,9 @@
     const align = horiz;
 
     const ls = item.lineSpacing || 1;
-    const eyebrowLH=34*ls, titleLH=60*ls;
+    const px = v => v * (W/100);
+    const eyebrowPx = px(item.eyebrowSize||1.1), titlePx = px(item.titleSize||2.5);
+    const eyebrowLH = eyebrowPx*1.21*ls, titleLH = titlePx*1.25*ls;
     const titleLines = item.titleLines||[];
     const cards = item.cards||[];
     const scale = item.cardScale || 1;
@@ -1381,16 +1402,17 @@
     ctx.textAlign = align;
     let cy = startY;
     if(item.eyebrow){
-      ctx.fillStyle = '#5fd0dc'; ctx.font = '700 28px "Noto Sans KR", sans-serif';
+      ctx.fillStyle = '#5fd0dc'; ctx.font = `${item.eyebrowWeight||700} ${eyebrowPx}px "Noto Sans KR", sans-serif`;
       ctx.fillText(item.eyebrow, x, cy);
       cy += titleLH;
     }
-    ctx.fillStyle = '#e9f4f6'; ctx.font = '700 50px "Noto Serif KR", serif';
+    ctx.fillStyle = '#e9f4f6'; ctx.font = `${item.titleWeight||700} ${titlePx}px "Noto Serif KR", serif`;
     titleLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += titleLH; });
 
     cy += 40;
     const cardAlign = item.cardAlign || 'left';
     const pad = 24*scale;
+    const numPx = px(item.numSize||1.6)*scale, namePx = px(item.nameSize||1.15)*scale, descPx = px(item.descSize||0.85)*scale;
     let cx = horiz==='left' ? 140 : horiz==='right' ? (W-140-totalW) : (W/2 - totalW/2);
     cards.forEach(card=>{
       ctx.fillStyle = 'rgba(255,255,255,0.10)';
@@ -1399,13 +1421,13 @@
       roundRect(ctx,cx,cy,cardW,cardH,16); ctx.stroke();
       ctx.textAlign = cardAlign;
       const tx = cardAlign==='left' ? cx+pad : cardAlign==='right' ? cx+cardW-pad : cx+cardW/2;
-      ctx.fillStyle = '#5fd0dc'; ctx.font = `700 ${28*scale}px "Noto Serif KR", serif`;
+      ctx.fillStyle = '#5fd0dc'; ctx.font = `${item.numWeight||700} ${numPx}px "Noto Serif KR", serif`;
       ctx.fillText(card.num||'', tx, cy+48*scale);
-      ctx.fillStyle = '#e9f4f6'; ctx.font = `700 ${21*scale}px "Noto Sans KR", sans-serif`;
+      ctx.fillStyle = '#e9f4f6'; ctx.font = `${item.nameWeight||700} ${namePx}px "Noto Sans KR", sans-serif`;
       ctx.fillText(card.name||'', tx, cy+82*scale);
-      ctx.fillStyle = '#dcecef'; ctx.font = `400 ${16*scale}px "Noto Sans KR", sans-serif`;
+      ctx.fillStyle = '#dcecef'; ctx.font = `${item.descWeight||400} ${descPx}px "Noto Sans KR", sans-serif`;
       let ly = cy+112*scale;
-      wrapLines(ctx, card.desc||'', cardW-2*pad).forEach(line=>{ ctx.fillText(line, tx, ly); ly+=23*scale; });
+      wrapLines(ctx, card.desc||'', cardW-2*pad).forEach(line=>{ ctx.fillText(line, tx, ly); ly+=descPx*1.4; });
       cx += cardW+gap;
     });
   }
@@ -1484,8 +1506,13 @@
           type:'services', bgColor: servicesData.bgColor, bgImgUrl: servicesData.bgType==='photo' ? servicesData.bgImg : '',
           position: servicesData.position, lineSpacing: servicesData.lineSpacing||1,
           eyebrow: servicesData.eyebrow||'', titleLines: (servicesData.title||'').split('\n'),
+          eyebrowSize: servicesData.eyebrowSize||1.1, eyebrowWeight: servicesData.eyebrowWeight||700,
+          titleSize: servicesData.titleSize||2.5, titleWeight: servicesData.titleWeight||700,
           cards: (servicesData.cards||[]).map(c=>({num:c.num||'', name:c.name||'', desc:c.desc||''})),
           cardAlign: servicesData.cardAlign||'left', cardScale: servicesData.cardScale||1,
+          numSize: servicesData.numSize||1.6, numWeight: servicesData.numWeight||700,
+          nameSize: servicesData.nameSize||1.15, nameWeight: servicesData.nameWeight||700,
+          descSize: servicesData.descSize||0.85, descWeight: servicesData.descWeight||400,
           durMs: (Number(servicesData.dur)||8)*1000
         };
       }
