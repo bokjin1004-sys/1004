@@ -40,8 +40,8 @@
   .panel-inner .eyebrow{font-size:1.1vw;color:var(--gold);font-weight:700;margin-bottom:2vh;}
   .panel-inner h1{font-family:'Noto Serif KR',serif;font-weight:700;font-size:3.8vw;line-height:1.45;text-shadow:0 2px 24px rgba(0,0,0,.4);}
   .panel-inner .sub{margin-top:2.4vh;font-size:1.25vw;color:#d6ecf0;}
-  .grid5{position:relative;z-index:3;display:flex;gap:1.6vw;padding:0 5vw;justify-content:center;flex-wrap:wrap;}
-  .grid5 .card{width:16vw;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:1.6vw 1.3vw;color:var(--paper);}
+  .grid5{position:relative;z-index:3;display:grid;grid-template-columns:repeat(5, minmax(0, 1fr));gap:1.1vw;padding:0 4vw;}
+  .grid5 .card{min-width:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:1.3vw 1vw;color:var(--paper);}
   .grid5 .card .num{font-family:'Noto Serif KR',serif;font-size:1.6vw;color:var(--gold);font-weight:700;}
   .grid5 .card .name{margin-top:.8vh;font-size:1.15vw;font-weight:700;}
   .grid5 .card .desc{margin-top:.8vh;font-size:.85vw;color:#c7dfe4;line-height:1.5;}
@@ -262,11 +262,14 @@
   const SLIDES_KEY = '1004house_promo_slides_v2';
   const DEFAULT_STYLE = {
     position: 'bottom-left',
-    tagColor: '#5fd0dc', tagSize: 1.3,
-    titleColor: '#e9f4f6', titleSize: 2.9,
-    descColor: '#d6ecf0', descSize: 1.25,
+    tagColor: '#5fd0dc', tagSize: 1.3, tagWeight: 700,
+    titleColor: '#e9f4f6', titleSize: 2.9, titleWeight: 700,
+    descColor: '#d6ecf0', descSize: 1.25, descWeight: 400,
     lineSpacing: 1
   };
+  const WEIGHT_OPTIONS = [
+    [400, '보통'], [500, '중간'], [700, '굵게'], [900, '매우 굵게']
+  ];
   function getStyle(s){ return Object.assign({}, DEFAULT_STYLE, s.style || {}); }
 
   function defaultSlides(){
@@ -545,9 +548,9 @@
       el.innerHTML = `
         <div class="bg" style="background-image:url('${escapeAttr(s.img||'')}')"></div>
         <div class="caption">
-          ${s.tag ? `<div class="tag" style="color:${st.tagColor};font-size:${st.tagSize}vw;line-height:${1.3*st.lineSpacing};">${escapeHtml(s.tag)}</div>` : ''}
-          <h2 style="color:${st.titleColor};font-size:${st.titleSize}vw;line-height:${1.35*st.lineSpacing};">${titleHtml}</h2>
-          ${s.desc ? `<p style="color:${st.descColor};font-size:${st.descSize}vw;line-height:${1.5*st.lineSpacing};">${escapeHtml(s.desc)}</p>` : ''}
+          ${s.tag ? `<div class="tag" style="color:${st.tagColor};font-size:${st.tagSize}vw;font-weight:${st.tagWeight||700};line-height:${1.3*st.lineSpacing};">${escapeHtml(s.tag)}</div>` : ''}
+          <h2 style="color:${st.titleColor};font-size:${st.titleSize}vw;font-weight:${st.titleWeight||700};line-height:${1.35*st.lineSpacing};">${titleHtml}</h2>
+          ${s.desc ? `<p style="color:${st.descColor};font-size:${st.descSize}vw;font-weight:${st.descWeight||400};line-height:${1.5*st.lineSpacing};">${escapeHtml(s.desc)}</p>` : ''}
         </div>`;
       dynamicSlot.appendChild(el);
       applyPosition(el, el.querySelector('.caption'), st.position);
@@ -955,14 +958,17 @@
               <div class="style-row">
                 <div class="colorbox"><label>태그 색</label><input type="color" data-sf="tagColor" value="${st.tagColor}"></div>
                 <div><label>태그 크기</label><input type="number" data-sf="tagSize" min="0.6" max="3" step="0.1" value="${st.tagSize}"></div>
+                <div><label>태그 굵기</label><select data-sf="tagWeight">${WEIGHT_OPTIONS.map(([v,l])=>`<option value="${v}" ${Number(st.tagWeight||700)===v?'selected':''}>${l}</option>`).join('')}</select></div>
               </div>
               <div class="style-row">
                 <div class="colorbox"><label>제목 색</label><input type="color" data-sf="titleColor" value="${st.titleColor}"></div>
                 <div><label>제목 크기</label><input type="number" data-sf="titleSize" min="1.2" max="6" step="0.1" value="${st.titleSize}"></div>
+                <div><label>제목 굵기</label><select data-sf="titleWeight">${WEIGHT_OPTIONS.map(([v,l])=>`<option value="${v}" ${Number(st.titleWeight||700)===v?'selected':''}>${l}</option>`).join('')}</select></div>
               </div>
               <div class="style-row">
                 <div class="colorbox"><label>설명 색</label><input type="color" data-sf="descColor" value="${st.descColor}"></div>
                 <div><label>설명 크기</label><input type="number" data-sf="descSize" min="0.6" max="3" step="0.1" value="${st.descSize}"></div>
+                <div><label>설명 굵기</label><select data-sf="descWeight">${WEIGHT_OPTIONS.map(([v,l])=>`<option value="${v}" ${Number(st.descWeight||400)===v?'selected':''}>${l}</option>`).join('')}</select></div>
               </div>
             </div>
           </div>
@@ -990,7 +996,8 @@
           const field = inp.dataset.sf;
           inp.addEventListener('input', ()=>{
             slide.style = getStyle(slide);
-            slide.style[field] = (field==='tagSize'||field==='titleSize'||field==='descSize'||field==='lineSpacing') ? (Number(inp.value)||1) : inp.value;
+            const numericFields = ['tagSize','titleSize','descSize','lineSpacing','tagWeight','titleWeight','descWeight'];
+            slide.style[field] = numericFields.includes(field) ? (Number(inp.value)||1) : inp.value;
             persistAll(true);
           });
         });
@@ -1360,15 +1367,15 @@
     ctx.textAlign = align;
     let cy = startY;
     if(item.tag){
-      ctx.fillStyle = st.tagColor; ctx.font = `700 ${tagPx}px "Noto Sans KR", sans-serif`;
+      ctx.fillStyle = st.tagColor; ctx.font = `${st.tagWeight||700} ${tagPx}px "Noto Sans KR", sans-serif`;
       ctx.fillText(item.tag, x, cy);
       cy += titleLH;
     }
-    ctx.fillStyle = st.titleColor; ctx.font = `700 ${titlePx}px "Noto Serif KR", serif`;
+    ctx.fillStyle = st.titleColor; ctx.font = `${st.titleWeight||700} ${titlePx}px "Noto Serif KR", serif`;
     titleLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += titleLH; });
     if(descLines.length){
       cy += 16;
-      ctx.fillStyle = st.descColor; ctx.font = `400 ${descPx}px "Noto Sans KR", sans-serif`;
+      ctx.fillStyle = st.descColor; ctx.font = `${st.descWeight||400} ${descPx}px "Noto Sans KR", sans-serif`;
       descLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += descLH; });
     }
   }
