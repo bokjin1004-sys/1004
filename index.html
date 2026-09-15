@@ -303,7 +303,10 @@
     eyebrow: '전남 신안 · 1004보금자리',
     title: '함께 나누는 미소,\n같이 걸어가는 아름다운 동행',
     sub: '발달장애인의 존엄한 독립과 따뜻한 지역사회 동행을 지원합니다',
-    dur: 6, bgType: 'color', bgColor: '#12313f', bgImg: '', position: 'middle-center', lineSpacing: 1
+    dur: 6, bgType: 'color', bgColor: '#12313f', bgImg: '', position: 'middle-center', lineSpacing: 1,
+    eyebrowSize: 1.1, eyebrowWeight: 700,
+    titleSize: 3.8, titleWeight: 700,
+    subSize: 1.25, subWeight: 400
   };
   function loadIntro(){
     try{ const raw = localStorage.getItem(INTRO_KEY); if(raw) return Object.assign({}, DEFAULT_INTRO, JSON.parse(raw)); }catch(e){}
@@ -317,6 +320,7 @@
     eyebrow: '서비스 안내',
     title: '거주인의 요구에 부합한\n다섯 가지 서비스',
     dur: 8, bgType: 'color', bgColor: '#123b52', bgImg: '', position: 'middle-center', lineSpacing: 1,
+    cardAlign: 'left', cardScale: 1,
     cards: [
       {num:'01', name:'서비스지원팀', desc:'개별화·일상생활·문화여가·가족연계 지원'},
       {num:'02', name:'건강지원팀', desc:'정기 건강검진과 맞춤 치료 연계'},
@@ -337,7 +341,10 @@
     eyebrow: '후원 및 문의',
     title: '나눔을 실천하는\n당신이 아름답습니다',
     dur: 7, bgType: 'color', bgColor: '#12313f', bgImg: '', position: 'middle-center', lineSpacing: 1,
-    items: ['☎ 061-275-0767', '전남 신안군 압해읍 구항길 92-76', '1004house.co.kr']
+    items: ['☎ 061-275-0767', '전남 신안군 압해읍 구항길 92-76', '1004house.co.kr'],
+    eyebrowSize: 1.1, eyebrowWeight: 700,
+    titleSize: 3.8, titleWeight: 700,
+    itemsSize: 1.15, itemsWeight: 400
   };
   function loadContact(){
     try{ const raw = localStorage.getItem(CONTACT_KEY); if(raw) return Object.assign({}, DEFAULT_CONTACT, JSON.parse(raw)); }catch(e){}
@@ -491,9 +498,9 @@
     const ls = introData.lineSpacing || 1;
     const titleHtml = (introData.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
     inner.innerHTML = `
-      <div class="eyebrow" style="line-height:${1.3*ls};">${escapeHtml(introData.eyebrow||'')}</div>
-      <h1 style="line-height:${1.45*ls};">${titleHtml}</h1>
-      <div class="sub" style="line-height:${1.5*ls};">${escapeHtml(introData.sub||'')}</div>
+      <div class="eyebrow" style="line-height:${1.3*ls};font-size:${introData.eyebrowSize||1.1}vw;font-weight:${introData.eyebrowWeight||700};">${escapeHtml(introData.eyebrow||'')}</div>
+      <h1 style="line-height:${1.45*ls};font-size:${introData.titleSize||3.8}vw;font-weight:${introData.titleWeight||700};">${titleHtml}</h1>
+      <div class="sub" style="line-height:${1.5*ls};font-size:${introData.subSize||1.25}vw;font-weight:${introData.subWeight||400};">${escapeHtml(introData.sub||'')}</div>
     `;
   }
 
@@ -505,8 +512,14 @@
     applyPanelPosition(el, inner, servicesData.position);
     const ls = servicesData.lineSpacing || 1;
     const titleHtml = (servicesData.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
+    const cardAlign = servicesData.cardAlign || 'left';
+    const cardScale = servicesData.cardScale || 1;
     const cardsHtml = (servicesData.cards||[]).map(c=>`
-      <div class="card"><div class="num">${escapeHtml(c.num||'')}</div><div class="name">${escapeHtml(c.name||'')}</div><div class="desc">${escapeHtml(c.desc||'')}</div></div>
+      <div class="card" style="text-align:${cardAlign};padding:${1.6*cardScale}vw ${1.3*cardScale}vw;">
+        <div class="num" style="font-size:${1.6*cardScale}vw;">${escapeHtml(c.num||'')}</div>
+        <div class="name" style="font-size:${1.15*cardScale}vw;">${escapeHtml(c.name||'')}</div>
+        <div class="desc" style="font-size:${0.85*cardScale}vw;">${escapeHtml(c.desc||'')}</div>
+      </div>
     `).join('');
     inner.innerHTML = `
       <div class="eyebrow" style="line-height:${1.3*ls};">${escapeHtml(servicesData.eyebrow||'')}</div>
@@ -525,9 +538,9 @@
     const titleHtml = (contactData.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
     const itemsHtml = (contactData.items||[]).map(s=>`<span>${escapeHtml(s)}</span>`).join('');
     inner.innerHTML = `
-      <div class="eyebrow" style="line-height:${1.3*ls};">${escapeHtml(contactData.eyebrow||'')}</div>
-      <h1 style="line-height:${1.45*ls};">${titleHtml}</h1>
-      <div class="contact-line">${itemsHtml}</div>
+      <div class="eyebrow" style="line-height:${1.3*ls};font-size:${contactData.eyebrowSize||1.1}vw;font-weight:${contactData.eyebrowWeight||700};">${escapeHtml(contactData.eyebrow||'')}</div>
+      <h1 style="line-height:${1.45*ls};font-size:${contactData.titleSize||3.8}vw;font-weight:${contactData.titleWeight||700};">${titleHtml}</h1>
+      <div class="contact-line" style="font-size:${contactData.itemsSize||1.15}vw;font-weight:${contactData.itemsWeight||400};">${itemsHtml}</div>
     `;
   }
 
@@ -731,6 +744,50 @@
     if(inp) inp.addEventListener('input', ()=>{ data.lineSpacing = Number(inp.value)||1; persistFn(true); });
   }
 
+  function textStyleFieldHtml(label, data, sizeKey, weightKey, sizeDefault, weightDefault, min, max){
+    const size = data[sizeKey] != null ? data[sizeKey] : sizeDefault;
+    const weight = Number(data[weightKey] != null ? data[weightKey] : weightDefault);
+    return `
+      <div class="style-row">
+        <div><label>${label} 크기</label><input type="number" data-tf="${sizeKey}" min="${min}" max="${max}" step="0.1" value="${size}"></div>
+        <div><label>${label} 굵기</label><select data-tf="${weightKey}">${WEIGHT_OPTIONS.map(([v,l])=>`<option value="${v}" ${weight===v?'selected':''}>${l}</option>`).join('')}</select></div>
+      </div>
+    `;
+  }
+  function bindTextStyleFields(container, data, persistFn){
+    container.querySelectorAll('[data-tf]').forEach(inp=>{
+      const f = inp.dataset.tf;
+      inp.addEventListener('input', ()=>{ data[f] = Number(inp.value) || 0; persistFn(true); });
+    });
+  }
+
+  function serviceCardFieldsHtml(data){
+    const align = data.cardAlign || 'left';
+    const scale = data.cardScale != null ? data.cardScale : 1;
+    return `
+      <div class="subhead">카드(상자) 스타일</div>
+      <div class="row2">
+        <div><label>글씨 정렬</label>
+          <select data-cardstyle="cardAlign">
+            <option value="left" ${align==='left'?'selected':''}>왼쪽</option>
+            <option value="center" ${align==='center'?'selected':''}>가운데</option>
+            <option value="right" ${align==='right'?'selected':''}>오른쪽</option>
+          </select>
+        </div>
+        <div><label>상자 크기</label><input type="number" data-cardstyle="cardScale" min="0.6" max="1.8" step="0.05" value="${scale}"></div>
+      </div>
+    `;
+  }
+  function bindServiceCardFields(container, data, persistFn){
+    container.querySelectorAll('[data-cardstyle]').forEach(inp=>{
+      const f = inp.dataset.cardstyle;
+      inp.addEventListener('input', ()=>{
+        data[f] = f==='cardScale' ? (Number(inp.value)||1) : inp.value;
+        persistFn(true);
+      });
+    });
+  }
+
   function bgFieldsHtml(data){
     return `
       <div class="subhead">배경</div>
@@ -822,6 +879,12 @@
           <div><label>부제(작은 설명 문장)</label><textarea data-f="sub" rows="2">${escapeHtml(introData.sub||'')}</textarea></div>
           ${posFieldHtml(introData)}
           ${lineSpacingFieldHtml(introData)}
+          <div class="subhead">라벨 글씨</div>
+          ${textStyleFieldHtml('라벨', introData, 'eyebrowSize', 'eyebrowWeight', 1.1, 700, 0.5, 3)}
+          <div class="subhead">제목 글씨</div>
+          ${textStyleFieldHtml('제목', introData, 'titleSize', 'titleWeight', 3.8, 700, 1.5, 6)}
+          <div class="subhead">부제 글씨</div>
+          ${textStyleFieldHtml('부제', introData, 'subSize', 'subWeight', 1.25, 400, 0.6, 3)}
           ${bgFieldsHtml(introData)}
         `;
         body.querySelectorAll('[data-f]').forEach(inp=>{
@@ -831,6 +894,7 @@
         });
         bindPosField(body, introData, persistAll);
         bindLineSpacingField(body, introData, persistAll);
+        bindTextStyleFields(body, introData, persistAll);
         bindBgFields(body, introData, persistAll);
       }
 
@@ -843,6 +907,7 @@
           <div><label>제목 (줄바꿈은 그대로 반영돼요)</label><textarea data-f="title" rows="2">${escapeHtml(servicesData.title||'')}</textarea></div>
           <div id="svcCards_${i}" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
           <button class="btn small ghost" data-act="addCard" style="margin-top:10px; width:fit-content;">+ 카드 추가</button>
+          ${serviceCardFieldsHtml(servicesData)}
           ${posFieldHtml(servicesData)}
           ${lineSpacingFieldHtml(servicesData)}
           ${bgFieldsHtml(servicesData)}
@@ -852,6 +917,7 @@
           inp.addEventListener('input', ()=>{ servicesData[f] = f==='dur' ? (Number(inp.value)||8) : inp.value; saveServices(servicesData); });
           inp.addEventListener('blur', ()=> persistAll(true));
         });
+        bindServiceCardFields(body, servicesData, persistAll);
         bindPosField(body, servicesData, persistAll);
         bindLineSpacingField(body, servicesData, persistAll);
         bindBgFields(body, servicesData, persistAll);
@@ -895,6 +961,12 @@
           <button class="btn small ghost" data-act="addItem" style="margin-top:10px; width:fit-content;">+ 항목 추가</button>
           ${posFieldHtml(contactData)}
           ${lineSpacingFieldHtml(contactData)}
+          <div class="subhead">라벨 글씨</div>
+          ${textStyleFieldHtml('라벨', contactData, 'eyebrowSize', 'eyebrowWeight', 1.1, 700, 0.5, 3)}
+          <div class="subhead">제목 글씨</div>
+          ${textStyleFieldHtml('제목', contactData, 'titleSize', 'titleWeight', 3.8, 700, 1.5, 6)}
+          <div class="subhead">연락처 항목 글씨</div>
+          ${textStyleFieldHtml('항목', contactData, 'itemsSize', 'itemsWeight', 1.15, 400, 0.5, 3)}
           ${bgFieldsHtml(contactData)}
         `;
         body.querySelectorAll('[data-f]').forEach(inp=>{
@@ -904,6 +976,7 @@
         });
         bindPosField(body, contactData, persistAll);
         bindLineSpacingField(body, contactData, persistAll);
+        bindTextStyleFields(body, contactData, persistAll);
         bindBgFields(body, contactData, persistAll);
         const itemsWrap = body.querySelector(`#ctItems_${i}`);
         (contactData.items||[]).forEach((v, vi)=>{
@@ -1251,8 +1324,10 @@
     const align = horiz;
 
     const ls = item.lineSpacing || 1;
-    const eyebrowLH=40*ls, titleLH=88*ls, subLH=42*ls;
-    ctx.font = '400 30px "Noto Sans KR", sans-serif';
+    const px = v => v * (W/100);
+    const eyebrowPx = px(item.eyebrowSize||1.1), titlePx = px(item.titleSize||3.8), subPx = px(item.subSize||1.25);
+    const eyebrowLH = eyebrowPx*1.33*ls, titleLH = titlePx*1.19*ls, subLH = subPx*1.4*ls;
+    ctx.font = `${item.subWeight||400} ${subPx}px "Noto Sans KR", sans-serif`;
     let subLines = [];
     (item.subLines||[]).forEach(s=>{ subLines = subLines.concat(wrapLines(ctx, s, W*0.66)); });
     const titleLines = item.titleLines||[];
@@ -1267,15 +1342,15 @@
     ctx.textAlign = align;
     let cy = startY;
     if(item.eyebrow){
-      ctx.fillStyle = '#5fd0dc'; ctx.font = '700 30px "Noto Sans KR", sans-serif';
+      ctx.fillStyle = '#5fd0dc'; ctx.font = `${item.eyebrowWeight||700} ${eyebrowPx}px "Noto Sans KR", sans-serif`;
       ctx.fillText(item.eyebrow, x, cy);
       cy += titleLH;
     }
-    ctx.fillStyle = '#e9f4f6'; ctx.font = '700 74px "Noto Serif KR", serif';
+    ctx.fillStyle = '#e9f4f6'; ctx.font = `${item.titleWeight||700} ${titlePx}px "Noto Serif KR", serif`;
     titleLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += titleLH; });
     if(subLines.length){
       cy += 26;
-      ctx.fillStyle = '#d6ecf0'; ctx.font = '400 30px "Noto Sans KR", sans-serif';
+      ctx.fillStyle = '#d6ecf0'; ctx.font = `${item.subWeight||400} ${subPx}px "Noto Sans KR", sans-serif`;
       subLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += subLH; });
     }
   }
@@ -1290,7 +1365,8 @@
     const eyebrowLH=34*ls, titleLH=60*ls;
     const titleLines = item.titleLines||[];
     const cards = item.cards||[];
-    const cardW=300, cardH=210, gap=26, n=cards.length || 1;
+    const scale = item.cardScale || 1;
+    const cardW=300*scale, cardH=210*scale, gap=26*scale, n=cards.length || 1;
     const totalW = n*cardW + (n-1)*gap;
     const cardsBlockH = cardH + 40;
     const textBlockH = (item.eyebrow?titleLH:0) + titleLines.length*titleLH;
@@ -1313,20 +1389,23 @@
     titleLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += titleLH; });
 
     cy += 40;
+    const cardAlign = item.cardAlign || 'left';
+    const pad = 24*scale;
     let cx = horiz==='left' ? 140 : horiz==='right' ? (W-140-totalW) : (W/2 - totalW/2);
     cards.forEach(card=>{
       ctx.fillStyle = 'rgba(255,255,255,0.10)';
       roundRect(ctx,cx,cy,cardW,cardH,16); ctx.fill();
       ctx.strokeStyle = 'rgba(255,255,255,0.20)'; ctx.lineWidth=1;
       roundRect(ctx,cx,cy,cardW,cardH,16); ctx.stroke();
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#5fd0dc'; ctx.font = '700 28px "Noto Serif KR", serif';
-      ctx.fillText(card.num||'', cx+24, cy+48);
-      ctx.fillStyle = '#e9f4f6'; ctx.font = '700 21px "Noto Sans KR", sans-serif';
-      ctx.fillText(card.name||'', cx+24, cy+82);
-      ctx.fillStyle = '#dcecef'; ctx.font = '400 16px "Noto Sans KR", sans-serif';
-      let ly = cy+112;
-      wrapLines(ctx, card.desc||'', cardW-48).forEach(line=>{ ctx.fillText(line, cx+24, ly); ly+=23; });
+      ctx.textAlign = cardAlign;
+      const tx = cardAlign==='left' ? cx+pad : cardAlign==='right' ? cx+cardW-pad : cx+cardW/2;
+      ctx.fillStyle = '#5fd0dc'; ctx.font = `700 ${28*scale}px "Noto Serif KR", serif`;
+      ctx.fillText(card.num||'', tx, cy+48*scale);
+      ctx.fillStyle = '#e9f4f6'; ctx.font = `700 ${21*scale}px "Noto Sans KR", sans-serif`;
+      ctx.fillText(card.name||'', tx, cy+82*scale);
+      ctx.fillStyle = '#dcecef'; ctx.font = `400 ${16*scale}px "Noto Sans KR", sans-serif`;
+      let ly = cy+112*scale;
+      wrapLines(ctx, card.desc||'', cardW-2*pad).forEach(line=>{ ctx.fillText(line, tx, ly); ly+=23*scale; });
       cx += cardW+gap;
     });
   }
@@ -1394,7 +1473,10 @@
           type:'panel', bgColor: introData.bgColor, bgImgUrl: introData.bgType==='photo' ? introData.bgImg : '',
           position: introData.position, lineSpacing: introData.lineSpacing||1,
           eyebrow: introData.eyebrow||'', titleLines: (introData.title||'').split('\n'),
-          subLines: [introData.sub||''], durMs: (Number(introData.dur)||6)*1000
+          subLines: [introData.sub||''], durMs: (Number(introData.dur)||6)*1000,
+          eyebrowSize: introData.eyebrowSize||1.1, eyebrowWeight: introData.eyebrowWeight||700,
+          titleSize: introData.titleSize||3.8, titleWeight: introData.titleWeight||700,
+          subSize: introData.subSize||1.25, subWeight: introData.subWeight||400
         };
       }
       if(tok==='services'){
@@ -1403,6 +1485,7 @@
           position: servicesData.position, lineSpacing: servicesData.lineSpacing||1,
           eyebrow: servicesData.eyebrow||'', titleLines: (servicesData.title||'').split('\n'),
           cards: (servicesData.cards||[]).map(c=>({num:c.num||'', name:c.name||'', desc:c.desc||''})),
+          cardAlign: servicesData.cardAlign||'left', cardScale: servicesData.cardScale||1,
           durMs: (Number(servicesData.dur)||8)*1000
         };
       }
@@ -1411,7 +1494,10 @@
           type:'panel', bgColor: contactData.bgColor, bgImgUrl: contactData.bgType==='photo' ? contactData.bgImg : '',
           position: contactData.position, lineSpacing: contactData.lineSpacing||1,
           eyebrow: contactData.eyebrow||'', titleLines: (contactData.title||'').split('\n'),
-          subLines: [(contactData.items||[]).join('      ')], durMs: (Number(contactData.dur)||7)*1000
+          subLines: [(contactData.items||[]).join('      ')], durMs: (Number(contactData.dur)||7)*1000,
+          eyebrowSize: contactData.eyebrowSize||1.1, eyebrowWeight: contactData.eyebrowWeight||700,
+          titleSize: contactData.titleSize||3.8, titleWeight: contactData.titleWeight||700,
+          subSize: contactData.itemsSize||1.15, subWeight: contactData.itemsWeight||400
         };
       }
       const s = slidesData.find(x=>x.id===tok);
