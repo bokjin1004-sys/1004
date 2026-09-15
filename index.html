@@ -61,6 +61,7 @@
     background:rgba(10,18,26,.55); color:#e9f4f6; border:1px solid rgba(255,255,255,.35);
     padding:10px 16px; border-radius:999px; font-size:14px; font-weight:700; cursor:pointer;
     backdrop-filter:blur(4px);
+    transition:opacity .35s ease;
   }
   #videoDownload:disabled{ opacity:.5; cursor:default; }
   #playPauseBtn, #nextBtn{ top:auto; bottom:3vh; }
@@ -185,35 +186,7 @@
     <div class="hint">
       여기서 수정한 내용은 이 브라우저에 자동 저장되어, 다음에 이 파일을 열어도 그대로 남아있어요.<br>
       사진은 "파일 선택"으로 올리거나, 인터넷에 있는 이미지라면 "이미지 주소"만 입력해도 됩니다.<br>
-      각 카드의 ↑↓ 버튼으로 <b>전체 재생 순서</b>를 자유롭게 바꿀 수 있어요 (인트로·서비스·연락처 화면도 포함). 인트로·서비스·연락처 화면은 각자 배경색이나 배경 사진도 따로 지정할 수 있어요.<br><br>
-      <b>⚠ 다른 사람들에게도 보이게 하려면:</b> 이 브라우저에만 저장된 내용은 나만 보입니다. 아래 "GitHub에 바로 저장하기"로
-      직접 커밋하거나, "내보내기 (백업 파일)"로 받은 <code>content.json</code>을 저장소의 <code>data/content.json</code>에
-      덮어써서 git push해야 웹사이트를 방문하는 모든 사람에게 보여집니다.
-    </div>
-
-    <div class="card-ed" id="ghSyncCard" style="flex-direction:column; align-items:stretch; border-color:rgba(95,208,220,.35);">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
-        <label style="font-size:13px; color:#e9f4f6; font-weight:700;">🚀 GitHub에 바로 저장하기 (추천)</label>
-        <span id="ghSyncStatus" style="font-size:12px; color:#9fb9c2;"></span>
-      </div>
-      <div class="hint" style="margin-bottom:14px;">
-        아래 정보를 한 번만 넣어두면, 그 다음부터는 <b>"GitHub에 저장"</b> 버튼 하나로 지금 편집한 내용이
-        바로 <code>data/content.json</code>에 커밋되고, 1분 정도 뒤 웹사이트에 그대로 반영됩니다.
-        토큰은 이 브라우저에만 저장되고 GitHub 서버로만 전송됩니다 (내보내기 파일에는 포함되지 않아요).<br>
-        <b>토큰 만드는 법:</b> GitHub 접속 → 오른쪽 위 프로필 사진 → Settings → 맨 아래 Developer settings →
-        Personal access tokens → Fine-grained tokens → Generate new token. <b>Repository access</b>는
-        이 저장소(<code>1004</code>) 하나만 선택하고, <b>Permissions → Contents</b>를 <b>Read and write</b>로만
-        설정해서 만드세요.
-      </div>
-      <div class="row2">
-        <div><label>저장소 (owner/repo)</label><input type="text" id="ghRepo" placeholder="bokjin1004-sys/1004"></div>
-        <div><label>브랜치</label><input type="text" id="ghBranch" placeholder="claude/determined-meitner-vwgjgh"></div>
-      </div>
-      <div><label>Personal Access Token</label><input type="password" id="ghToken" placeholder="github_pat_..."></div>
-      <div style="display:flex; gap:10px; margin-top:12px; align-items:center; flex-wrap:wrap;">
-        <button class="btn" id="ghSaveBtn">🚀 GitHub에 저장</button>
-        <button class="btn ghost small" id="ghForget">토큰 지우기</button>
-      </div>
+      각 카드의 ↑↓ 버튼으로 <b>전체 재생 순서</b>를 자유롭게 바꿀 수 있어요 (인트로·서비스·연락처 화면도 포함). 인트로·서비스·연락처 화면은 각자 배경색이나 배경 사진도 따로 지정할 수 있어요.
     </div>
 
     <div class="card-ed" style="align-items:center;">
@@ -237,6 +210,34 @@
       </div>
     </div>
 
+    <div class="card-ed" style="align-items:center;">
+      <div class="fields">
+        <label style="font-size:13px; color:#e9f4f6; font-weight:700; margin-bottom:8px;">☁️ GitHub 연동 (누구나 접속하면 최신 내용이 자동으로 보임)</label>
+        <div class="hint" style="margin-bottom:10px;">
+          저장소 정보는 이 프로젝트 것으로 이미 채워져 있어요. 페이지를 여는 모든 사람은 <b>토큰 없이도</b>
+          자동으로 최신 내용을 불러와요. <b>사진/문구를 바꿔서 모두에게 반영하고 싶을 때만</b> 아래
+          <b>Personal Access Token</b>을 입력하고 "GitHub에 저장"을 누르세요. 토큰은 이 브라우저에만
+          저장되고, 내보내기 파일에는 포함되지 않아요.<br>
+          <b>토큰 만드는 법:</b> GitHub 접속 → 오른쪽 위 프로필 → Settings → 맨 아래 Developer settings →
+          Personal access tokens → Fine-grained tokens → Generate new token. Repository access는 이
+          저장소 하나만 선택하고, Permissions → Contents를 Read and write로만 켜서 만드세요.
+        </div>
+        <div class="row2">
+          <div><label>GitHub 사용자명(owner)</label><input type="text" id="ghOwner" placeholder="bokjin1004-sys"></div>
+          <div><label>저장소 이름(repo)</label><input type="text" id="ghRepo" placeholder="1004"></div>
+        </div>
+        <div class="row2">
+          <div><label>파일 경로</label><input type="text" id="ghPath" placeholder="data/content.json"></div>
+          <div><label>브랜치</label><input type="text" id="ghBranch" placeholder="claude/determined-meitner-vwgjgh"></div>
+        </div>
+        <div><label>Personal Access Token (저장할 때만 필요, 이 브라우저에만 저장됨)</label><input type="password" id="ghToken" placeholder="github_pat_..."></div>
+        <div class="toolbar" style="margin:10px 0 0;">
+          <button class="btn" id="ghSaveBtn">☁️ GitHub에 저장</button>
+          <button class="btn ghost" id="ghLoadBtn">↻ GitHub에서 지금 불러오기</button>
+        </div>
+      </div>
+    </div>
+
     <div class="toolbar">
       <button class="btn" id="addSlide">+ 새 사진 슬라이드 추가</button>
       <button class="btn ghost" id="exportJson">내보내기 (백업 파일)</button>
@@ -255,19 +256,6 @@
 <div id="toast"></div>
 
 <script>
-(async function(){
-  // data/content.json에 저장된 내용을 이 브라우저에 아직 편집 기록이 없을 때만 기본값으로 불러옵니다.
-  let remoteContent = null;
-  try {
-    const res = await fetch('data/content.json', { cache: 'no-store' });
-    if (res.ok) remoteContent = await res.json();
-  } catch (e) {}
-  function seedFromRemote(key, value){
-    if (value !== undefined && value !== null && localStorage.getItem(key) === null) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-  }
-
   /* ---------------- 데이터 저장/불러오기 ---------------- */
   function uid(){ return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
@@ -305,7 +293,6 @@
     return defaultSlides();
   }
   function saveSlides(slides){ localStorage.setItem(SLIDES_KEY, JSON.stringify(slides)); }
-  seedFromRemote(SLIDES_KEY, remoteContent && remoteContent.slides);
   let slidesData = loadSlides();
 
   const INTRO_KEY = '1004house_promo_intro_v2';
@@ -320,7 +307,6 @@
     return JSON.parse(JSON.stringify(DEFAULT_INTRO));
   }
   function saveIntro(d){ localStorage.setItem(INTRO_KEY, JSON.stringify(d)); }
-  seedFromRemote(INTRO_KEY, remoteContent && remoteContent.intro);
   let introData = loadIntro();
 
   const SERVICES_KEY = '1004house_promo_services_v2';
@@ -341,7 +327,6 @@
     return JSON.parse(JSON.stringify(DEFAULT_SERVICES));
   }
   function saveServices(d){ localStorage.setItem(SERVICES_KEY, JSON.stringify(d)); }
-  seedFromRemote(SERVICES_KEY, remoteContent && remoteContent.services);
   let servicesData = loadServices();
 
   const CONTACT_KEY = '1004house_promo_contact_v2';
@@ -356,7 +341,6 @@
     return JSON.parse(JSON.stringify(DEFAULT_CONTACT));
   }
   function saveContact(d){ localStorage.setItem(CONTACT_KEY, JSON.stringify(d)); }
-  seedFromRemote(CONTACT_KEY, remoteContent && remoteContent.contact);
   let contactData = loadContact();
 
   const THEME_KEY = '1004house_promo_theme_v2';
@@ -369,7 +353,6 @@
     return Object.assign({}, DEFAULT_THEME);
   }
   function saveTheme(t){ localStorage.setItem(THEME_KEY, JSON.stringify(t)); }
-  seedFromRemote(THEME_KEY, remoteContent && remoteContent.theme);
   function applyTheme(t){
     stage.classList.remove('t-fade','t-slide','t-zoom','t-cut');
     stage.classList.add('t-' + (t.transitionType||'fade'));
@@ -401,7 +384,6 @@
     return defaultDeckOrder();
   }
   function saveDeck(d){ localStorage.setItem(DECK_KEY, JSON.stringify(d)); }
-  seedFromRemote(DECK_KEY, remoteContent && remoteContent.deck);
   let deckOrder = loadDeck();
 
   function insertNewPhotoToken(id){
@@ -453,6 +435,20 @@
       return original;
     }
   }
+
+  /* ---------------- 화면 절전/화면보호기 방지 ---------------- */
+  let wakeLock = null;
+  async function requestWakeLock(){
+    try{
+      if('wakeLock' in navigator){
+        wakeLock = await navigator.wakeLock.request('screen');
+      }
+    }catch(e){ /* 지원하지 않거나 권한이 없으면 조용히 무시 */ }
+  }
+  requestWakeLock();
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible') requestWakeLock();
+  });
 
   function escapeHtml(str){
     return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -628,6 +624,34 @@
 
   const nextBtn = document.getElementById('nextBtn');
   nextBtn.addEventListener('click', (e)=>{ e.stopPropagation(); next(); });
+
+  /* ---- 컨트롤 버튼 자동 숨김 (마우스 이동/클릭 시에만 보임) ---- */
+  function getUiButtons(){
+    return [
+      document.getElementById('playPauseBtn'),
+      document.getElementById('nextBtn'),
+      document.getElementById('editToggle'),
+      document.getElementById('videoDownload')
+    ];
+  }
+  let uiHideTimer = null;
+  function setUiOpacity(visible){
+    getUiButtons().forEach(btn=>{
+      if(!btn) return;
+      const isDisabled = btn.disabled;
+      btn.style.opacity = visible ? (isDisabled ? '0.5' : '1') : '0';
+      btn.style.pointerEvents = (visible && !isDisabled) ? 'auto' : 'none';
+    });
+  }
+  function showUiTemporarily(){
+    setUiOpacity(true);
+    clearTimeout(uiHideTimer);
+    uiHideTimer = setTimeout(()=> setUiOpacity(false), 3000);
+  }
+  ['mousemove','mousedown','touchstart','keydown'].forEach(evt=>{
+    document.addEventListener(evt, showUiTemporarily, {passive:true});
+  });
+  showUiTemporarily();
 
   /* ---------------- 편집 UI ---------------- */
   const editor = document.getElementById('editor');
@@ -1008,14 +1032,42 @@
     }
   });
 
+  function buildBackupObject(){
+    return { slides: slidesData, intro: introData, services: servicesData, contact: contactData, theme: theme, deck: deckOrder };
+  }
+
+  function applyBackupData(parsed){
+    if(Array.isArray(parsed)){
+      slidesData = parsed;
+      slidesData.forEach(s=>{ if(!s.id) s.id = uid(); });
+      deckOrder = defaultDeckOrder();
+      persistAll();
+      return true;
+    } else if(parsed && typeof parsed === 'object'){
+      if(Array.isArray(parsed.slides)){
+        slidesData = parsed.slides;
+        slidesData.forEach(s=>{ if(!s.id) s.id = uid(); });
+      }
+      if(parsed.intro) introData = Object.assign({}, DEFAULT_INTRO, parsed.intro);
+      if(parsed.services) servicesData = Object.assign({}, DEFAULT_SERVICES, parsed.services);
+      if(parsed.contact) contactData = Object.assign({}, DEFAULT_CONTACT, parsed.contact);
+      if(parsed.theme){
+        theme = Object.assign({}, DEFAULT_THEME, parsed.theme); saveTheme(theme); applyTheme(theme);
+        themeTransType.value = theme.transitionType; themeTransSpeed.value = theme.transitionSpeed;
+      }
+      deckOrder = Array.isArray(parsed.deck) ? parsed.deck : defaultDeckOrder();
+      persistAll();
+      return true;
+    }
+    return false;
+  }
+
   document.getElementById('exportJson').addEventListener('click', ()=>{
-    const backup = { slides: slidesData, intro: introData, services: servicesData, contact: contactData, theme: theme, deck: deckOrder };
-    const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+    const blob = new Blob([JSON.stringify(buildBackupObject(), null, 2)], {type:'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'content.json';
+    a.download = '1004house_promo_backup.json';
     a.click();
-    toast('content.json 다운로드됨 — data 폴더에 덮어쓰고 GitHub에 올리면 모두에게 반영돼요');
   });
 
   document.getElementById('importJson').addEventListener('change', (e)=>{
@@ -1025,35 +1077,95 @@
     reader.onload = ()=>{
       try{
         const parsed = JSON.parse(reader.result);
-        if(Array.isArray(parsed)){
-          slidesData = parsed;
-          slidesData.forEach(s=>{ if(!s.id) s.id = uid(); });
-          deckOrder = defaultDeckOrder();
-          persistAll();
-        } else if(parsed && typeof parsed === 'object'){
-          if(Array.isArray(parsed.slides)){
-            slidesData = parsed.slides;
-            slidesData.forEach(s=>{ if(!s.id) s.id = uid(); });
-          }
-          if(parsed.intro) introData = Object.assign({}, DEFAULT_INTRO, parsed.intro);
-          if(parsed.services) servicesData = Object.assign({}, DEFAULT_SERVICES, parsed.services);
-          if(parsed.contact) contactData = Object.assign({}, DEFAULT_CONTACT, parsed.contact);
-          if(parsed.theme){
-            theme = Object.assign({}, DEFAULT_THEME, parsed.theme); saveTheme(theme); applyTheme(theme);
-            themeTransType.value = theme.transitionType; themeTransSpeed.value = theme.transitionSpeed;
-          }
-          deckOrder = Array.isArray(parsed.deck) ? parsed.deck : defaultDeckOrder();
-          persistAll();
-        } else {
-          alert('올바른 백업 파일이 아니에요.');
-        }
+        if(!applyBackupData(parsed)) alert('올바른 백업 파일이 아니에요.');
       }catch(err){ alert('파일을 읽을 수 없어요.'); }
     };
     reader.readAsText(file);
   });
 
-  renderDeckEditor();
-  buildPlaybackDom();
+  /* ---------------- GitHub 연동 (여러 기기 자동 반영) ---------------- */
+  const GITHUB_KEY = '1004house_promo_github_v1';
+  const DEFAULT_GH_CFG = { owner:'bokjin1004-sys', repo:'1004', path:'data/content.json', branch:'claude/determined-meitner-vwgjgh', token:'' };
+  function loadGhCfg(){
+    try{ const raw = localStorage.getItem(GITHUB_KEY); if(raw) return Object.assign({}, DEFAULT_GH_CFG, JSON.parse(raw)); }catch(e){}
+    return Object.assign({}, DEFAULT_GH_CFG);
+  }
+  function saveGhCfg(cfg){ localStorage.setItem(GITHUB_KEY, JSON.stringify(cfg)); }
+  let ghCfg = loadGhCfg();
+
+  function ghConfigured(){ return !!(ghCfg.owner && ghCfg.repo && ghCfg.path); }
+
+  async function githubLoad(silent){
+    if(!ghConfigured()) return false;
+    try{
+      const branch = ghCfg.branch || DEFAULT_GH_CFG.branch;
+      const url = `https://raw.githubusercontent.com/${ghCfg.owner}/${ghCfg.repo}/${branch}/${ghCfg.path}?t=${Date.now()}`;
+      const res = await fetch(url);
+      if(!res.ok){ if(!silent) toast('GitHub에서 아직 저장된 내용이 없어요'); return false; }
+      const parsed = await res.json();
+      applyBackupData(parsed);
+      if(!silent) toast('GitHub에서 불러왔어요');
+      return true;
+    }catch(e){
+      if(!silent) alert('GitHub 불러오기 실패: ' + e.message);
+      return false;
+    }
+  }
+
+  async function githubSave(){
+    if(!ghCfg.owner || !ghCfg.repo || !ghCfg.token){
+      alert('GitHub 저장소 정보와 토큰을 먼저 입력해주세요.');
+      return;
+    }
+    const branch = ghCfg.branch || DEFAULT_GH_CFG.branch;
+    const apiUrl = `https://api.github.com/repos/${ghCfg.owner}/${ghCfg.repo}/contents/${ghCfg.path}`;
+    try{
+      let sha;
+      try{
+        const getRes = await fetch(`${apiUrl}?ref=${branch}`, {
+          headers: { Authorization: `token ${ghCfg.token}`, Accept: 'application/vnd.github+json' }
+        });
+        if(getRes.ok){ const j = await getRes.json(); sha = j.sha; }
+      }catch(e){}
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(buildBackupObject(), null, 2))));
+      const putRes = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: { Authorization: `token ${ghCfg.token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: '홍보영상 내용 업데이트', content, branch, sha })
+      });
+      if(putRes.ok){
+        toast('GitHub에 저장했어요');
+      } else {
+        const err = await putRes.json().catch(()=>({}));
+        alert('GitHub 저장 실패: ' + (err.message || putRes.status));
+      }
+    }catch(e){
+      alert('GitHub 저장 중 오류: ' + e.message);
+    }
+  }
+
+  const ghOwner = document.getElementById('ghOwner');
+  const ghRepo = document.getElementById('ghRepo');
+  const ghPath = document.getElementById('ghPath');
+  const ghBranch = document.getElementById('ghBranch');
+  const ghToken = document.getElementById('ghToken');
+  ghOwner.value = ghCfg.owner; ghRepo.value = ghCfg.repo; ghPath.value = ghCfg.path||DEFAULT_GH_CFG.path;
+  ghBranch.value = ghCfg.branch||DEFAULT_GH_CFG.branch; ghToken.value = ghCfg.token;
+  [ghOwner,ghRepo,ghPath,ghBranch,ghToken].forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      ghCfg = { owner:ghOwner.value.trim(), repo:ghRepo.value.trim(), path:ghPath.value.trim()||DEFAULT_GH_CFG.path, branch:ghBranch.value.trim()||DEFAULT_GH_CFG.branch, token:ghToken.value.trim() };
+      saveGhCfg(ghCfg);
+    });
+  });
+  document.getElementById('ghSaveBtn').addEventListener('click', githubSave);
+  document.getElementById('ghLoadBtn').addEventListener('click', ()=> githubLoad(false));
+
+  (async function init(){
+    if(ghConfigured()) await githubLoad(true);
+    renderDeckEditor();
+    buildPlaybackDom();
+  })();
+
 
   /* ---------------- 동영상으로 다운로드 ---------------- */
   const videoBtn = document.getElementById('videoDownload');
@@ -1391,97 +1503,6 @@
   }
 
   videoBtn.addEventListener('click', recordVideo);
-
-  /* ---------------- GitHub에 바로 저장하기 ---------------- */
-  const GH_CONFIG_KEY = '1004house_gh_config_v1';
-  function loadGhConfig(){
-    try{
-      const raw = localStorage.getItem(GH_CONFIG_KEY);
-      if(raw) return Object.assign({ repo:'', branch:'', token:'' }, JSON.parse(raw));
-    }catch(e){}
-    return { repo:'', branch:'', token:'' };
-  }
-  function saveGhConfig(cfg){ localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(cfg)); }
-  let ghConfig = loadGhConfig();
-
-  const ghRepoInput = document.getElementById('ghRepo');
-  const ghBranchInput = document.getElementById('ghBranch');
-  const ghTokenInput = document.getElementById('ghToken');
-  const ghSaveBtn = document.getElementById('ghSaveBtn');
-  const ghForgetBtn = document.getElementById('ghForget');
-  const ghStatusEl = document.getElementById('ghSyncStatus');
-
-  ghRepoInput.value = ghConfig.repo;
-  ghBranchInput.value = ghConfig.branch;
-  ghTokenInput.value = ghConfig.token;
-
-  function persistGhConfig(){
-    ghConfig = { repo: ghRepoInput.value.trim(), branch: ghBranchInput.value.trim(), token: ghTokenInput.value.trim() };
-    saveGhConfig(ghConfig);
-  }
-  [ghRepoInput, ghBranchInput, ghTokenInput].forEach(el => el.addEventListener('change', persistGhConfig));
-
-  ghForgetBtn.addEventListener('click', ()=>{
-    ghTokenInput.value = '';
-    persistGhConfig();
-    toast('토큰을 지웠어요');
-  });
-
-  function utf8ToBase64(str){
-    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))));
-  }
-
-  async function saveToGitHub(){
-    persistGhConfig();
-    const { repo, branch, token } = ghConfig;
-    if(!repo || !token){
-      alert('저장소(owner/repo)와 Personal Access Token을 먼저 입력해 주세요.');
-      return;
-    }
-    const apiBase = `https://api.github.com/repos/${repo}/contents/data/content.json`;
-    ghSaveBtn.disabled = true;
-    ghStatusEl.textContent = '저장 중…';
-    try{
-      const backup = { slides: slidesData, intro: introData, services: servicesData, contact: contactData, theme: theme, deck: deckOrder };
-      const content = utf8ToBase64(JSON.stringify(backup, null, 2));
-
-      const getUrl = branch ? `${apiBase}?ref=${encodeURIComponent(branch)}` : apiBase;
-      const getRes = await fetch(getUrl, {
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
-      });
-      let sha;
-      if(getRes.ok){
-        sha = (await getRes.json()).sha;
-      } else if(getRes.status !== 404){
-        throw new Error(`기존 파일 조회 실패 (${getRes.status})`);
-      }
-
-      const putBody = { message: '사진/문구 업데이트', content };
-      if(sha) putBody.sha = sha;
-      if(branch) putBody.branch = branch;
-
-      const putRes = await fetch(apiBase, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(putBody)
-      });
-      if(!putRes.ok){
-        const errBody = await putRes.json().catch(()=>({}));
-        throw new Error(errBody.message || `저장 실패 (${putRes.status})`);
-      }
-
-      ghStatusEl.textContent = '방금 저장됨 ✓';
-      toast('GitHub에 저장했어요! 1분 정도 뒤 웹사이트에 반영돼요');
-    }catch(err){
-      ghStatusEl.textContent = '';
-      alert('GitHub 저장 중 문제가 발생했어요: ' + err.message);
-    }finally{
-      ghSaveBtn.disabled = false;
-    }
-  }
-  ghSaveBtn.addEventListener('click', saveToGitHub);
-
-})();
 </script>
 
 </body>
