@@ -436,20 +436,6 @@
     }
   }
 
-  /* ---------------- 화면 절전/화면보호기 방지 ---------------- */
-  let wakeLock = null;
-  async function requestWakeLock(){
-    try{
-      if('wakeLock' in navigator){
-        wakeLock = await navigator.wakeLock.request('screen');
-      }
-    }catch(e){ /* 지원하지 않거나 권한이 없으면 조용히 무시 */ }
-  }
-  requestWakeLock();
-  document.addEventListener('visibilitychange', ()=>{
-    if(document.visibilityState === 'visible') requestWakeLock();
-  });
-
   function escapeHtml(str){
     return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
@@ -653,6 +639,20 @@
   });
   showUiTemporarily();
 
+  /* ---- 화면 꺼짐/절전 방지 (지원하는 브라우저에서) ---- */
+  let wakeLock = null;
+  async function requestWakeLock(){
+    try{
+      if('wakeLock' in navigator){
+        wakeLock = await navigator.wakeLock.request('screen');
+      }
+    }catch(e){ /* 배터리 부족 등으로 거부될 수 있음 - 조용히 무시 */ }
+  }
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible') requestWakeLock();
+  });
+  requestWakeLock();
+
   /* ---------------- 편집 UI ---------------- */
   const editor = document.getElementById('editor');
   const deckList = document.getElementById('deckList');
@@ -749,12 +749,14 @@
     container.querySelectorAll('[data-bf]').forEach(inp=>{
       const f = inp.dataset.bf;
       if(f==='bgFile'){
-        inp.addEventListener('change', async (e)=>{
+        inp.addEventListener('change', (e)=>{
           const file = e.target.files[0];
           if(!file) return;
-          data.bgImg = await loadImageForUpload(file);
-          data.bgType = 'photo';
-          persistFn();
+          loadImageForUpload(file).then(dataUrl=>{
+            data.bgImg = dataUrl;
+            data.bgType = 'photo';
+            persistFn();
+          });
         });
       } else {
         inp.addEventListener('input', ()=>{
@@ -968,11 +970,13 @@
         body.querySelectorAll('[data-f]').forEach(inp=>{
           const field = inp.dataset.f;
           if(field==='file'){
-            inp.addEventListener('change', async (e)=>{
+            inp.addEventListener('change', (e)=>{
               const file = e.target.files[0];
               if(!file) return;
-              slide.img = await loadImageForUpload(file);
-              persistAll();
+              loadImageForUpload(file).then(dataUrl=>{
+                slide.img = dataUrl;
+                persistAll();
+              });
             });
           } else {
             inp.addEventListener('input', ()=>{
