@@ -352,7 +352,7 @@
     dur: 8, bgType: 'color', bgColor: '#123b52', bgImg: '', position: 'middle-center', lineSpacing: 1,
     eyebrowSize: 1.1, eyebrowWeight: 700,
     titleSize: 2.5, titleWeight: 700,
-    cardAlign: 'left', cardScale: 1,
+    cardAlign: 'left', cardWidth: 100, cardHeight: 0,
     numSize: 1.6, numWeight: 700,
     nameSize: 1.15, nameWeight: 700,
     descSize: 0.85, descWeight: 400,
@@ -563,12 +563,13 @@
     const ls = servicesData.lineSpacing || 1;
     const titleHtml = (servicesData.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
     const cardAlign = servicesData.cardAlign || 'left';
-    const cardScale = servicesData.cardScale || 1;
-    const numSize = (servicesData.numSize||1.6)*cardScale;
-    const nameSize = (servicesData.nameSize||1.15)*cardScale;
-    const descSize = (servicesData.descSize||0.85)*cardScale;
+    const cardWidth = servicesData.cardWidth || 100;
+    const cardHeight = servicesData.cardHeight || 0;
+    const numSize = servicesData.numSize||1.6;
+    const nameSize = servicesData.nameSize||1.15;
+    const descSize = servicesData.descSize||0.85;
     const cardsHtml = (servicesData.cards||[]).map(c=>`
-      <div class="card" style="text-align:${cardAlign};padding:${1.6*cardScale}vw ${1.3*cardScale}vw;">
+      <div class="card" style="text-align:${cardAlign};width:${cardWidth}%;margin:0 auto;${cardHeight>0?`min-height:${cardHeight}vw;`:''}">
         <div class="num" style="font-size:${numSize}vw;font-weight:${servicesData.numWeight||700};">${escapeHtml(c.num||'')}</div>
         <div class="name" style="font-size:${nameSize}vw;font-weight:${servicesData.nameWeight||700};">${escapeHtml(c.name||'')}</div>
         <div class="desc" style="font-size:${descSize}vw;font-weight:${servicesData.descWeight||400};">${escapeHtml(c.desc||'')}</div>
@@ -875,7 +876,8 @@
 
   function serviceCardFieldsHtml(data){
     const align = data.cardAlign || 'left';
-    const scale = data.cardScale != null ? data.cardScale : 1;
+    const width = data.cardWidth != null ? data.cardWidth : 100;
+    const height = data.cardHeight != null ? data.cardHeight : 0;
     return `
       <div class="subhead">카드(상자) 스타일</div>
       <div class="row2">
@@ -886,7 +888,11 @@
             <option value="right" ${align==='right'?'selected':''}>오른쪽</option>
           </select>
         </div>
-        <div><label>상자 크기</label><input type="number" data-cardstyle="cardScale" min="0.6" max="1.8" step="0.05" value="${scale}"></div>
+        <div></div>
+      </div>
+      <div class="row2">
+        <div><label>상자 가로 폭(%, 칸 안에서 차지하는 비율)</label><input type="number" data-cardstyle="cardWidth" min="40" max="100" step="5" value="${width}"></div>
+        <div><label>상자 세로 높이(vw, 0=자동)</label><input type="number" data-cardstyle="cardHeight" min="0" max="20" step="0.5" value="${height}"></div>
       </div>
       <div class="subhead">카드 안 번호 글씨</div>
       ${textStyleFieldHtml('번호', data, 'numSize', 'numWeight', 1.6, 700, 0.6, 3)}
@@ -900,7 +906,7 @@
     container.querySelectorAll('[data-cardstyle]').forEach(inp=>{
       const f = inp.dataset.cardstyle;
       inp.addEventListener('input', ()=>{
-        data[f] = f==='cardScale' ? (Number(inp.value)||1) : inp.value;
+        data[f] = (f==='cardWidth'||f==='cardHeight') ? (Number(inp.value)||0) : inp.value;
         persistFn(true);
       });
     });
@@ -1563,8 +1569,10 @@
     const eyebrowLH = eyebrowPx*1.21*ls, titleLH = titlePx*1.25*ls;
     const titleLines = item.titleLines||[];
     const cards = item.cards||[];
-    const scale = item.cardScale || 1;
-    const cardW=300*scale, cardH=210*scale, gap=26*scale, n=cards.length || 1;
+    const cardWidthPct = item.cardWidth || 100;
+    const cardW = 300 * (cardWidthPct/100);
+    const cardH = item.cardHeight ? px(item.cardHeight) : 210;
+    const gap = 26, n = cards.length || 1;
     const totalW = n*cardW + (n-1)*gap;
     const cardsBlockH = cardH + 40;
     const textBlockH = (item.eyebrow?titleLH:0) + titleLines.length*titleLH;
@@ -1588,8 +1596,8 @@
 
     cy += 40;
     const cardAlign = item.cardAlign || 'left';
-    const pad = 24*scale;
-    const numPx = px(item.numSize||1.6)*scale, namePx = px(item.nameSize||1.15)*scale, descPx = px(item.descSize||0.85)*scale;
+    const pad = 24;
+    const numPx = px(item.numSize||1.6), namePx = px(item.nameSize||1.15), descPx = px(item.descSize||0.85);
     let cx = horiz==='left' ? 140 : horiz==='right' ? (W-140-totalW) : (W/2 - totalW/2);
     cards.forEach(card=>{
       ctx.fillStyle = 'rgba(255,255,255,0.10)';
@@ -1599,11 +1607,11 @@
       ctx.textAlign = cardAlign;
       const tx = cardAlign==='left' ? cx+pad : cardAlign==='right' ? cx+cardW-pad : cx+cardW/2;
       ctx.fillStyle = '#5fd0dc'; ctx.font = `${item.numWeight||700} ${numPx}px "Noto Serif KR", serif`;
-      ctx.fillText(card.num||'', tx, cy+48*scale);
+      ctx.fillText(card.num||'', tx, cy+48);
       ctx.fillStyle = '#e9f4f6'; ctx.font = `${item.nameWeight||700} ${namePx}px "Noto Sans KR", sans-serif`;
-      ctx.fillText(card.name||'', tx, cy+82*scale);
+      ctx.fillText(card.name||'', tx, cy+82);
       ctx.fillStyle = '#dcecef'; ctx.font = `${item.descWeight||400} ${descPx}px "Noto Sans KR", sans-serif`;
-      let ly = cy+112*scale;
+      let ly = cy+112;
       wrapLines(ctx, card.desc||'', cardW-2*pad).forEach(line=>{ ctx.fillText(line, tx, ly); ly+=descPx*1.4; });
       cx += cardW+gap;
     });
@@ -1686,7 +1694,7 @@
           eyebrowSize: servicesData.eyebrowSize||1.1, eyebrowWeight: servicesData.eyebrowWeight||700,
           titleSize: servicesData.titleSize||2.5, titleWeight: servicesData.titleWeight||700,
           cards: (servicesData.cards||[]).map(c=>({num:c.num||'', name:c.name||'', desc:c.desc||''})),
-          cardAlign: servicesData.cardAlign||'left', cardScale: servicesData.cardScale||1,
+          cardAlign: servicesData.cardAlign||'left', cardWidth: servicesData.cardWidth||100, cardHeight: servicesData.cardHeight||0,
           numSize: servicesData.numSize||1.6, numWeight: servicesData.numWeight||700,
           nameSize: servicesData.nameSize||1.15, nameWeight: servicesData.nameWeight||700,
           descSize: servicesData.descSize||0.85, descWeight: servicesData.descWeight||400,
