@@ -9,7 +9,7 @@
 
 - `index.html` : 슬라이드쇼 재생 화면 + 편집 화면이 모두 들어있는 단일 페이지
 - `data/content.json` : 실제로 배포되는 슬라이드/문구 내용 (사진, 제목, 순서 등)
-- `.github/workflows/pages.yml` : `main` 브랜치에 push하면 자동으로 GitHub Pages에 배포
+- `.github/workflows/pages.yml` : 기본 브랜치(현재 `claude/determined-meitner-vwgjgh`)에 push하면 자동으로 GitHub Pages에 배포
 
 빌드 과정이 없는 순수 정적 페이지라서, 별도 설치 없이 파일을 그대로 열거나
 GitHub Pages에 올리면 바로 동작합니다.
@@ -38,7 +38,7 @@ GitHub Pages에 올리면 바로 동작합니다.
    git push
    ```
 
-5. `main` 브랜치에 push되면 GitHub Actions가 자동으로 GitHub Pages에 다시 배포합니다.
+5. 기본 브랜치에 push되면 GitHub Actions가 자동으로 GitHub Pages에 다시 배포합니다.
    (저장소의 Actions 탭에서 진행 상황을 확인할 수 있습니다.) 배포가 끝나면
    이제 새로 방문하는 모든 사람에게 바뀐 사진/문구가 보입니다.
 
@@ -49,7 +49,7 @@ GitHub Pages에 올리면 바로 동작합니다.
 
 1. GitHub 저장소의 **Settings → Pages**로 이동합니다.
 2. **Source**를 `GitHub Actions`로 선택합니다. (한 번만 설정하면 됩니다)
-3. `main` 브랜치에 push하면 `https://<사용자명>.github.io/<저장소명>/` 주소로 자동 배포됩니다.
+3. 기본 브랜치에 push하면 `https://<사용자명>.github.io/<저장소명>/` 주소로 자동 배포됩니다.
 
 ## 그 밖의 기능
 
