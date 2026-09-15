@@ -186,9 +186,34 @@
       여기서 수정한 내용은 이 브라우저에 자동 저장되어, 다음에 이 파일을 열어도 그대로 남아있어요.<br>
       사진은 "파일 선택"으로 올리거나, 인터넷에 있는 이미지라면 "이미지 주소"만 입력해도 됩니다.<br>
       각 카드의 ↑↓ 버튼으로 <b>전체 재생 순서</b>를 자유롭게 바꿀 수 있어요 (인트로·서비스·연락처 화면도 포함). 인트로·서비스·연락처 화면은 각자 배경색이나 배경 사진도 따로 지정할 수 있어요.<br><br>
-      <b>⚠ 다른 사람들에게도 보이게 하려면:</b> 편집이 끝나면 위의 "내보내기 (백업 파일)"을 눌러 <code>content.json</code>을 내려받고,
-      저장소의 <code>data/content.json</code> 파일을 그 내용으로 덮어쓴 뒤 git add/commit/push 하세요. 이 브라우저에만 저장된 내용은
-      나만 보이고, <code>data/content.json</code>에 반영해서 GitHub에 올려야 웹사이트를 방문하는 모든 사람에게 보여집니다.
+      <b>⚠ 다른 사람들에게도 보이게 하려면:</b> 이 브라우저에만 저장된 내용은 나만 보입니다. 아래 "GitHub에 바로 저장하기"로
+      직접 커밋하거나, "내보내기 (백업 파일)"로 받은 <code>content.json</code>을 저장소의 <code>data/content.json</code>에
+      덮어써서 git push해야 웹사이트를 방문하는 모든 사람에게 보여집니다.
+    </div>
+
+    <div class="card-ed" id="ghSyncCard" style="flex-direction:column; align-items:stretch; border-color:rgba(95,208,220,.35);">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+        <label style="font-size:13px; color:#e9f4f6; font-weight:700;">🚀 GitHub에 바로 저장하기 (추천)</label>
+        <span id="ghSyncStatus" style="font-size:12px; color:#9fb9c2;"></span>
+      </div>
+      <div class="hint" style="margin-bottom:14px;">
+        아래 정보를 한 번만 넣어두면, 그 다음부터는 <b>"GitHub에 저장"</b> 버튼 하나로 지금 편집한 내용이
+        바로 <code>data/content.json</code>에 커밋되고, 1분 정도 뒤 웹사이트에 그대로 반영됩니다.
+        토큰은 이 브라우저에만 저장되고 GitHub 서버로만 전송됩니다 (내보내기 파일에는 포함되지 않아요).<br>
+        <b>토큰 만드는 법:</b> GitHub 접속 → 오른쪽 위 프로필 사진 → Settings → 맨 아래 Developer settings →
+        Personal access tokens → Fine-grained tokens → Generate new token. <b>Repository access</b>는
+        이 저장소(<code>1004</code>) 하나만 선택하고, <b>Permissions → Contents</b>를 <b>Read and write</b>로만
+        설정해서 만드세요.
+      </div>
+      <div class="row2">
+        <div><label>저장소 (owner/repo)</label><input type="text" id="ghRepo" placeholder="bokjin1004-sys/1004"></div>
+        <div><label>브랜치</label><input type="text" id="ghBranch" placeholder="claude/determined-meitner-vwgjgh"></div>
+      </div>
+      <div><label>Personal Access Token</label><input type="password" id="ghToken" placeholder="github_pat_..."></div>
+      <div style="display:flex; gap:10px; margin-top:12px; align-items:center; flex-wrap:wrap;">
+        <button class="btn" id="ghSaveBtn">🚀 GitHub에 저장</button>
+        <button class="btn ghost small" id="ghForget">토큰 지우기</button>
+      </div>
     </div>
 
     <div class="card-ed" style="align-items:center;">
@@ -1366,6 +1391,95 @@
   }
 
   videoBtn.addEventListener('click', recordVideo);
+
+  /* ---------------- GitHub에 바로 저장하기 ---------------- */
+  const GH_CONFIG_KEY = '1004house_gh_config_v1';
+  function loadGhConfig(){
+    try{
+      const raw = localStorage.getItem(GH_CONFIG_KEY);
+      if(raw) return Object.assign({ repo:'', branch:'', token:'' }, JSON.parse(raw));
+    }catch(e){}
+    return { repo:'', branch:'', token:'' };
+  }
+  function saveGhConfig(cfg){ localStorage.setItem(GH_CONFIG_KEY, JSON.stringify(cfg)); }
+  let ghConfig = loadGhConfig();
+
+  const ghRepoInput = document.getElementById('ghRepo');
+  const ghBranchInput = document.getElementById('ghBranch');
+  const ghTokenInput = document.getElementById('ghToken');
+  const ghSaveBtn = document.getElementById('ghSaveBtn');
+  const ghForgetBtn = document.getElementById('ghForget');
+  const ghStatusEl = document.getElementById('ghSyncStatus');
+
+  ghRepoInput.value = ghConfig.repo;
+  ghBranchInput.value = ghConfig.branch;
+  ghTokenInput.value = ghConfig.token;
+
+  function persistGhConfig(){
+    ghConfig = { repo: ghRepoInput.value.trim(), branch: ghBranchInput.value.trim(), token: ghTokenInput.value.trim() };
+    saveGhConfig(ghConfig);
+  }
+  [ghRepoInput, ghBranchInput, ghTokenInput].forEach(el => el.addEventListener('change', persistGhConfig));
+
+  ghForgetBtn.addEventListener('click', ()=>{
+    ghTokenInput.value = '';
+    persistGhConfig();
+    toast('토큰을 지웠어요');
+  });
+
+  function utf8ToBase64(str){
+    return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16))));
+  }
+
+  async function saveToGitHub(){
+    persistGhConfig();
+    const { repo, branch, token } = ghConfig;
+    if(!repo || !token){
+      alert('저장소(owner/repo)와 Personal Access Token을 먼저 입력해 주세요.');
+      return;
+    }
+    const apiBase = `https://api.github.com/repos/${repo}/contents/data/content.json`;
+    ghSaveBtn.disabled = true;
+    ghStatusEl.textContent = '저장 중…';
+    try{
+      const backup = { slides: slidesData, intro: introData, services: servicesData, contact: contactData, theme: theme, deck: deckOrder };
+      const content = utf8ToBase64(JSON.stringify(backup, null, 2));
+
+      const getUrl = branch ? `${apiBase}?ref=${encodeURIComponent(branch)}` : apiBase;
+      const getRes = await fetch(getUrl, {
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json' }
+      });
+      let sha;
+      if(getRes.ok){
+        sha = (await getRes.json()).sha;
+      } else if(getRes.status !== 404){
+        throw new Error(`기존 파일 조회 실패 (${getRes.status})`);
+      }
+
+      const putBody = { message: '사진/문구 업데이트', content };
+      if(sha) putBody.sha = sha;
+      if(branch) putBody.branch = branch;
+
+      const putRes = await fetch(apiBase, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(putBody)
+      });
+      if(!putRes.ok){
+        const errBody = await putRes.json().catch(()=>({}));
+        throw new Error(errBody.message || `저장 실패 (${putRes.status})`);
+      }
+
+      ghStatusEl.textContent = '방금 저장됨 ✓';
+      toast('GitHub에 저장했어요! 1분 정도 뒤 웹사이트에 반영돼요');
+    }catch(err){
+      ghStatusEl.textContent = '';
+      alert('GitHub 저장 중 문제가 발생했어요: ' + err.message);
+    }finally{
+      ghSaveBtn.disabled = false;
+    }
+  }
+  ghSaveBtn.addEventListener('click', saveToGitHub);
 
 })();
 </script>

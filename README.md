@@ -24,11 +24,27 @@ GitHub Pages에 올리면 바로 동작합니다.
 
 ## 사진/문구를 추가해서 실제로 GitHub에 반영하는 방법
 
-1. `index.html`을 열고(로컬 서버 또는 GitHub Pages 주소로), **"✎ 사진 편집"**을 눌러
-   사진을 추가/교체하고 제목·설명·순서를 원하는 대로 편집합니다.
+### 방법 A. 편집 화면에서 "GitHub에 저장" 버튼으로 바로 반영 (추천, git 명령 몰라도 됨)
+
+1. **"✎ 사진 편집"** → **"🚀 GitHub에 바로 저장하기"** 칸에 아래 정보를 한 번만 입력합니다.
+   - 저장소: `bokjin1004-sys/1004`
+   - 브랜치: 저장소의 기본 브랜치 이름 (지금은 `claude/determined-meitner-vwgjgh`)
+   - Personal Access Token: GitHub → 프로필 → Settings → Developer settings →
+     Personal access tokens → Fine-grained tokens → Generate new token에서 발급.
+     **Repository access**는 이 저장소 하나만 선택하고, **Permissions → Contents**를
+     **Read and write**로만 설정해서 만드세요. (다른 권한은 켤 필요 없습니다.)
+   - 이 정보는 이 브라우저에만 저장되고, GitHub 서버로만 전송됩니다.
+2. 사진·제목·순서를 편집합니다.
+3. **"🚀 GitHub에 저장"** 버튼을 누르면 즉시 `data/content.json`에 커밋되고,
+   1분 정도 뒤 GitHub Pages 배포가 끝나면 모든 방문자에게 반영됩니다.
+   (저장소의 **Actions** 탭에서 배포 진행 상황을 확인할 수 있습니다.)
+
+### 방법 B. 직접 파일을 내려받아 git push (git 사용에 익숙한 경우)
+
+1. **"✎ 사진 편집"**에서 사진을 추가/교체하고 제목·설명·순서를 편집합니다.
    - 사진은 "파일 선택"으로 올리면 자동으로 파일 안에 그대로 포함되고(별도 이미지 파일 필요 없음),
      인터넷 상의 이미지라면 "이미지 주소(URL)"만 입력해도 됩니다.
-2. 편집이 끝나면 편집 화면 위쪽의 **"내보내기 (백업 파일)"**를 클릭해 `content.json` 파일을 내려받습니다.
+2. **"내보내기 (백업 파일)"**를 클릭해 `content.json` 파일을 내려받습니다.
 3. 내려받은 `content.json`으로 저장소의 `data/content.json` 파일을 덮어씁니다.
 4. 변경 사항을 커밋하고 push합니다.
 
@@ -39,8 +55,6 @@ GitHub Pages에 올리면 바로 동작합니다.
    ```
 
 5. 기본 브랜치에 push되면 GitHub Actions가 자동으로 GitHub Pages에 다시 배포합니다.
-   (저장소의 Actions 탭에서 진행 상황을 확인할 수 있습니다.) 배포가 끝나면
-   이제 새로 방문하는 모든 사람에게 바뀐 사진/문구가 보입니다.
 
 > 편집 화면의 "가져오기 (백업 파일)" 버튼으로 `content.json`을 다시 불러와서
 > 이어서 편집할 수도 있습니다.
