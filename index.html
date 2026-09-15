@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1004보금자리 홍보영상</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0f1720; --paper:#e9f4f6;
+    --gold:#5fd0dc;
+    --overlay-bottom: rgba(8,14,20,0.88);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:100%;height:100%;background:var(--ink);overflow:hidden;font-family:'Noto Sans KR',sans-serif;}
+  #stage{position:relative;width:100vw;height:100vh;}
+  .slide{position:absolute;inset:0;opacity:0;transition:opacity var(--tspeed,1.4s) ease, transform var(--tspeed,1.4s) ease;display:flex;flex-direction:column;justify-content:flex-end;}
+  .slide.active{opacity:1;z-index:2;}
+  #stage.t-slide .slide{transform:translateX(4%);}
+  #stage.t-slide .slide.active{transform:translateX(0);}
+  #stage.t-zoom .slide{transform:scale(1.06);}
+  #stage.t-zoom .slide.active{transform:scale(1);}
+  #stage.t-cut .slide{transition:none;}
+
+  .slide.photo .bg{position:absolute;inset:0;background-size:cover;background-position:center;transform:scale(1.06);animation:kenburns 9s ease-out forwards;}
+  @keyframes kenburns{from{transform:scale(1.06);}to{transform:scale(1);}}
+  .slide.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(8,14,20,.20) 0%, rgba(8,14,20,0) 30%, rgba(8,14,20,0) 45%, var(--overlay-bottom) 100%);}
+  .caption{position:relative;z-index:3;padding:6.5vh 6vw;color:var(--paper);width:100%;}
+  .caption .tag{font-size:1.05vw;color:var(--gold);font-weight:700;margin-bottom:1vh;}
+  .caption h2{font-family:'Noto Serif KR',serif;font-weight:700;font-size:3.2vw;line-height:1.35;max-width:72vw;text-shadow:0 2px 20px rgba(0,0,0,.35);}
+  .caption p{margin-top:1.4vh;font-size:1.2vw;max-width:56vw;color:#d6ecf0;}
+
+  .slide.panel{justify-content:center;align-items:center;background:radial-gradient(ellipse at 30% 20%, var(--panelColor, #12313f), var(--ink) 70%);}
+  .slide.panel .bg{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;}
+  .slide.panel.has-photo{background:var(--ink);}
+  .slide.panel.has-photo::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg, rgba(8,14,20,.40), rgba(8,14,20,.62));}
+  .halo{position:absolute;width:46vw;height:46vw;border-radius:50%;top:-14vw;right:-10vw;background:radial-gradient(circle, rgba(255,255,255,.10), transparent 70%);z-index:1;}
+  .panel-inner{position:relative;z-index:3;text-align:center;padding:0 8vw;color:var(--paper);}
+  .panel-inner .eyebrow{font-size:1.1vw;color:var(--gold);font-weight:700;margin-bottom:2vh;}
+  .panel-inner h1{font-family:'Noto Serif KR',serif;font-weight:700;font-size:3.8vw;line-height:1.45;text-shadow:0 2px 24px rgba(0,0,0,.4);}
+  .panel-inner .sub{margin-top:2.4vh;font-size:1.25vw;color:#d6ecf0;}
+  .grid5{position:relative;z-index:3;display:flex;gap:1.6vw;padding:0 5vw;justify-content:center;flex-wrap:wrap;}
+  .grid5 .card{width:16vw;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:1.6vw 1.3vw;color:var(--paper);}
+  .grid5 .card .num{font-family:'Noto Serif KR',serif;font-size:1.6vw;color:var(--gold);font-weight:700;}
+  .grid5 .card .name{margin-top:.8vh;font-size:1.15vw;font-weight:700;}
+  .grid5 .card .desc{margin-top:.8vh;font-size:.85vw;color:#c7dfe4;line-height:1.5;}
+  .contact-line{margin-top:3vh;font-size:1.15vw;color:#d6ecf0;display:flex;gap:2.4vw;justify-content:center;flex-wrap:wrap;}
+  #topbar{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:3.4vh 3vw 0;pointer-events:none;}
+  #wordmark{color:var(--paper);font-family:'Noto Serif KR',serif;font-weight:700;font-size:1.3vw;text-shadow:0 2px 10px rgba(0,0,0,.4);opacity:.92;}
+  #dots{display:flex;gap:.55vw;}
+  .dot{width:1.6vw;height:4px;border-radius:2px;background:rgba(255,255,255,.28);overflow:hidden;position:relative;}
+  .dot .fill{position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;}
+  .dot.done .fill{transform:scaleX(1);}
+  .dot.current .fill{animation:fillbar linear forwards;animation-duration:var(--dur,6s);}
+  @keyframes fillbar{to{transform:scaleX(1);}}
+  #tapzone{position:absolute;inset:0;z-index:20;cursor:pointer;}
+
+  #editToggle, #videoDownload, #playPauseBtn, #nextBtn{
+    position:absolute; top:3vh; z-index:50;
+    background:rgba(10,18,26,.55); color:#e9f4f6; border:1px solid rgba(255,255,255,.35);
+    padding:10px 16px; border-radius:999px; font-size:14px; font-weight:700; cursor:pointer;
+    backdrop-filter:blur(4px);
+  }
+  #videoDownload:disabled{ opacity:.5; cursor:default; }
+  #playPauseBtn, #nextBtn{ top:auto; bottom:3vh; }
+  #playPauseBtn{ font-size:18px; padding:10px 18px; }
+  #playPauseBtn:disabled, #nextBtn:disabled{ opacity:.5; cursor:default; }
+
+  #editor{
+    position:fixed; inset:0; z-index:100; background:#0f1720; color:#e9f4f6;
+    display:none; overflow-y:auto; font-family:'Noto Sans KR',sans-serif;
+  }
+  #editor.open{display:block;}
+  .ed-wrap{max-width:960px; margin:0 auto; padding:32px 24px 80px;}
+  .ed-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;}
+  .ed-head h1{font-family:'Noto Serif KR',serif; font-size:22px;}
+  .btn{
+    background:#2fa0b8; color:#0f1720; border:none; padding:10px 16px;
+    border-radius:8px; font-weight:700; font-size:14px; cursor:pointer;
+  }
+  .btn.ghost{background:transparent; color:#e9f4f6; border:1px solid rgba(255,255,255,.3);}
+  .btn.danger{background:#7a3b32; color:#fff;}
+  .btn.small{padding:6px 10px; font-size:12px;}
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
+  .section-title{font-size:13px; color:#e9f4f6; font-weight:700; margin:26px 0 10px;}
+  .subhead{font-size:12px; color:#9fb9c2; font-weight:700; margin:14px 0 6px;}
+  .card-ed{
+    background:#152029; border:1px solid rgba(255,255,255,.1); border-radius:12px;
+    padding:16px; margin-bottom:14px; display:flex; gap:16px;
+  }
+  .card-ed .thumb{
+    width:150px; height:90px; border-radius:8px; background-size:cover; background-position:center;
+    background-color:#22323c; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:#9fb9c2; text-align:center;
+  }
+  .card-ed .fields{flex:1; display:flex; flex-direction:column; gap:8px; min-width:0;}
+  .card-ed label{font-size:11px; color:#9fb9c2; display:block; margin-bottom:3px;}
+  .card-ed input[type=text], .card-ed textarea, .card-ed input[type=number], .card-ed select{
+    width:100%; background:#0f1720; border:1px solid rgba(255,255,255,.15); color:#e9f4f6;
+    padding:7px 9px; border-radius:6px; font-size:13px; font-family:inherit;
+  }
+  .card-ed input[type=color]{
+    width:100%; height:32px; padding:2px; border-radius:6px; border:1px solid rgba(255,255,255,.15);
+    background:#0f1720; cursor:pointer;
+  }
+  .style-row{display:flex; gap:10px; align-items:flex-end;}
+  .style-row > div{flex:1;}
+  .style-row .colorbox{flex:0 0 54px;}
+  .card-ed textarea{resize:vertical; min-height:36px;}
+  .row2{display:flex; gap:10px;}
+  .row2 > div{flex:1;}
+  .card-ed .side-btns{display:flex; flex-direction:column; gap:6px; flex-shrink:0;}
+  .hint{font-size:12px; color:#9fb9c2; line-height:1.6; margin-bottom:18px;}
+  .filepick{font-size:12px; color:#c7dfe4;}
+  .deck-badge{
+    display:inline-block; font-size:11px; font-weight:700; color:#5fd0dc;
+    background:rgba(95,208,220,.12); border:1px solid rgba(95,208,220,.3);
+    padding:2px 9px; border-radius:999px; margin-bottom:8px;
+  }
+  #toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:#2fa0b8; color:#0f1720; padding:10px 18px; border-radius:999px;
+    font-size:13px; font-weight:700; opacity:0; transition:opacity .3s; z-index:200; pointer-events:none;
+  }
+  #toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <!-- 인트로 -->
+  <div class="slide panel active" data-fixed="intro" data-dur="6000">
+    <div class="bg"></div>
+    <div class="halo"></div>
+    <div class="panel-inner" id="introInner"></div>
+  </div>
+
+  <!-- 사진/행사 슬라이드는 JS가 여기에 동적으로 삽입 -->
+  <div id="dynamicSlot"></div>
+
+  <!-- 서비스 안내 -->
+  <div class="slide panel" data-fixed="services" data-dur="8000">
+    <div class="bg"></div>
+    <div class="halo"></div>
+    <div class="panel-inner" id="servicesInner"></div>
+  </div>
+
+  <!-- 후원/연락처 -->
+  <div class="slide panel" data-fixed="contact" data-dur="7000">
+    <div class="bg"></div>
+    <div class="halo"></div>
+    <div class="panel-inner" id="contactInner"></div>
+  </div>
+</div>
+
+<div id="topbar">
+  <div id="wordmark">1004보금자리</div>
+  <div id="dots"></div>
+</div>
+
+<div id="tapzone" title="클릭하면 재생/일시정지"></div>
+<button id="playPauseBtn" style="left:2vw;" title="재생/정지">⏸</button>
+<button id="nextBtn" style="left:calc(2vw + 110px);" title="다음 슬라이드로">다음 ⏭</button>
+<button id="editToggle" style="right:2vw;">✎ 사진 편집</button>
+<button id="videoDownload" style="right:calc(2vw + 150px);">🎬 영상 다운로드</button>
+
+<div id="videoProgress" style="position:fixed;inset:0;z-index:300;background:rgba(10,18,26,.94);display:none;align-items:center;justify-content:center;flex-direction:column;color:#e9f4f6;font-family:'Noto Sans KR',sans-serif;">
+  <div style="font-size:18px;font-weight:700;margin-bottom:14px;">영상 만드는 중… <span id="vpCount"></span></div>
+  <div style="width:360px;height:8px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden;">
+    <div id="vpBar" style="height:100%;width:0%;background:#5fd0dc;transition:width .3s;"></div>
+  </div>
+  <div style="margin-top:14px;font-size:13px;color:#9fb9c2;max-width:360px;text-align:center;line-height:1.6;">
+    실제 슬라이드 재생 시간만큼 걸려요. 창을 닫지 말고 잠시 기다려주세요.
+  </div>
+</div>
+
+<!-- 편집 패널 -->
+<div id="editor">
+  <div class="ed-wrap">
+    <div class="ed-head">
+      <h1>홍보영상 편집</h1>
+      <button class="btn ghost" id="closeEditor">✕ 닫고 재생하기</button>
+    </div>
+    <div class="hint">
+      여기서 수정한 내용은 이 브라우저에 자동 저장되어, 다음에 이 파일을 열어도 그대로 남아있어요.<br>
+      사진은 "파일 선택"으로 올리거나, 인터넷에 있는 이미지라면 "이미지 주소"만 입력해도 됩니다.<br>
+      각 카드의 ↑↓ 버튼으로 <b>전체 재생 순서</b>를 자유롭게 바꿀 수 있어요 (인트로·서비스·연락처 화면도 포함). 인트로·서비스·연락처 화면은 각자 배경색이나 배경 사진도 따로 지정할 수 있어요.<br><br>
+      <b>⚠ 다른 사람들에게도 보이게 하려면:</b> 편집이 끝나면 위의 "내보내기 (백업 파일)"을 눌러 <code>content.json</code>을 내려받고,
+      저장소의 <code>data/content.json</code> 파일을 그 내용으로 덮어쓴 뒤 git add/commit/push 하세요. 이 브라우저에만 저장된 내용은
+      나만 보이고, <code>data/content.json</code>에 반영해서 GitHub에 올려야 웹사이트를 방문하는 모든 사람에게 보여집니다.
+    </div>
+
+    <div class="card-ed" style="align-items:center;">
+      <div class="fields">
+        <label style="font-size:13px; color:#e9f4f6; font-weight:700; margin-bottom:8px;">화면 전환</label>
+        <div class="row2">
+          <div>
+            <label>넘어가는 방법</label>
+            <select id="themeTransType">
+              <option value="fade">페이드(자연스럽게 겹치며 전환)</option>
+              <option value="slide">슬라이드(살짝 밀며 전환)</option>
+              <option value="zoom">확대(줌인 하며 전환)</option>
+              <option value="cut">즉시 전환(효과 없이 바로 바뀜)</option>
+            </select>
+          </div>
+          <div>
+            <label>전환 속도(초)</label>
+            <input type="number" id="themeTransSpeed" min="0.2" max="3" step="0.1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" id="addSlide">+ 새 사진 슬라이드 추가</button>
+      <button class="btn ghost" id="exportJson">내보내기 (백업 파일)</button>
+      <label class="btn ghost" style="cursor:pointer;">
+        가져오기 (백업 파일)
+        <input type="file" id="importJson" accept="application/json" style="display:none;">
+      </label>
+      <button class="btn danger" id="resetAll">기본값으로 초기화</button>
+    </div>
+
+    <div class="section-title">재생 순서 (↑↓ 로 순서를 바꾸세요)</div>
+    <div id="deckList"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(async function(){
+  // data/content.json에 저장된 내용을 이 브라우저에 아직 편집 기록이 없을 때만 기본값으로 불러옵니다.
+  let remoteContent = null;
+  try {
+    const res = await fetch('data/content.json', { cache: 'no-store' });
+    if (res.ok) remoteContent = await res.json();
+  } catch (e) {}
+  function seedFromRemote(key, value){
+    if (value !== undefined && value !== null && localStorage.getItem(key) === null) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+  }
+
+  /* ---------------- 데이터 저장/불러오기 ---------------- */
+  function uid(){ return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  const SLIDES_KEY = '1004house_promo_slides_v2';
+  const DEFAULT_STYLE = {
+    position: 'bottom-left',
+    tagColor: '#5fd0dc', tagSize: 1.3,
+    titleColor: '#e9f4f6', titleSize: 2.9,
+    descColor: '#d6ecf0', descSize: 1.25,
+    lineSpacing: 1
+  };
+  function getStyle(s){ return Object.assign({}, DEFAULT_STYLE, s.style || {}); }
+
+  function defaultSlides(){
+    return [
+      { id: uid(), img: 'http://1004house.co.kr/theme/sh/html/image/main_visual01.jpg', tag: '일상 속 동행',
+        title: '맞잡은 두 손으로 전해지는 온기,\n함께 걷는 눈부신 동행', desc: '', dur: 6, style: Object.assign({}, DEFAULT_STYLE) },
+      { id: uid(), img: 'http://1004house.co.kr/theme/sh/html/image/main_visual02.jpg', tag: '작은 일상, 큰 행복',
+        title: '작은 일상도 함께라면\n당연한 행복입니다', desc: '', dur: 6, style: Object.assign({}, DEFAULT_STYLE) },
+      { id: uid(), img: 'http://1004house.co.kr/theme/sh/html/image/main_visual03.jpg', tag: '프로그램 & 행사',
+        title: '거주인과 함께 만들어가는\n다양한 프로그램', desc: '이 사진들을 우리 시설의 실제 프로그램·행사 사진으로 바꿔보세요.', dur: 6, style: Object.assign({}, DEFAULT_STYLE) }
+    ];
+  }
+  function loadSlides(){
+    try{
+      const raw = localStorage.getItem(SLIDES_KEY);
+      if(raw){
+        const arr = JSON.parse(raw);
+        let changed = false;
+        arr.forEach(s=>{ if(!s.id){ s.id = uid(); changed = true; } });
+        if(changed) localStorage.setItem(SLIDES_KEY, JSON.stringify(arr));
+        return arr;
+      }
+    }catch(e){}
+    return defaultSlides();
+  }
+  function saveSlides(slides){ localStorage.setItem(SLIDES_KEY, JSON.stringify(slides)); }
+  seedFromRemote(SLIDES_KEY, remoteContent && remoteContent.slides);
+  let slidesData = loadSlides();
+
+  const INTRO_KEY = '1004house_promo_intro_v2';
+  const DEFAULT_INTRO = {
+    eyebrow: '전남 신안 · 1004보금자리',
+    title: '함께 나누는 미소,\n같이 걸어가는 아름다운 동행',
+    sub: '발달장애인의 존엄한 독립과 따뜻한 지역사회 동행을 지원합니다',
+    dur: 6, bgType: 'color', bgColor: '#12313f', bgImg: '', position: 'middle-center', lineSpacing: 1
+  };
+  function loadIntro(){
+    try{ const raw = localStorage.getItem(INTRO_KEY); if(raw) return Object.assign({}, DEFAULT_INTRO, JSON.parse(raw)); }catch(e){}
+    return JSON.parse(JSON.stringify(DEFAULT_INTRO));
+  }
+  function saveIntro(d){ localStorage.setItem(INTRO_KEY, JSON.stringify(d)); }
+  seedFromRemote(INTRO_KEY, remoteContent && remoteContent.intro);
+  let introData = loadIntro();
+
+  const SERVICES_KEY = '1004house_promo_services_v2';
+  const DEFAULT_SERVICES = {
+    eyebrow: '서비스 안내',
+    title: '거주인의 요구에 부합한\n다섯 가지 서비스',
+    dur: 8, bgType: 'color', bgColor: '#123b52', bgImg: '', position: 'middle-center', lineSpacing: 1,
+    cards: [
+      {num:'01', name:'서비스지원팀', desc:'개별화·일상생활·문화여가·가족연계 지원'},
+      {num:'02', name:'건강지원팀', desc:'정기 건강검진과 맞춤 치료 연계'},
+      {num:'03', name:'개별화지원팀', desc:'교육·발달·사회심리·직업재활 지원'},
+      {num:'04', name:'영양/급식지원팀', desc:'식습관과 선호를 고려한 급식 서비스'},
+      {num:'05', name:'행정지원팀', desc:'시설 운영과 후원·자원봉사 관리'}
+    ]
+  };
+  function loadServices(){
+    try{ const raw = localStorage.getItem(SERVICES_KEY); if(raw) return Object.assign({}, DEFAULT_SERVICES, JSON.parse(raw)); }catch(e){}
+    return JSON.parse(JSON.stringify(DEFAULT_SERVICES));
+  }
+  function saveServices(d){ localStorage.setItem(SERVICES_KEY, JSON.stringify(d)); }
+  seedFromRemote(SERVICES_KEY, remoteContent && remoteContent.services);
+  let servicesData = loadServices();
+
+  const CONTACT_KEY = '1004house_promo_contact_v2';
+  const DEFAULT_CONTACT = {
+    eyebrow: '후원 및 문의',
+    title: '나눔을 실천하는\n당신이 아름답습니다',
+    dur: 7, bgType: 'color', bgColor: '#12313f', bgImg: '', position: 'middle-center', lineSpacing: 1,
+    items: ['☎ 061-275-0767', '전남 신안군 압해읍 구항길 92-76', '1004house.co.kr']
+  };
+  function loadContact(){
+    try{ const raw = localStorage.getItem(CONTACT_KEY); if(raw) return Object.assign({}, DEFAULT_CONTACT, JSON.parse(raw)); }catch(e){}
+    return JSON.parse(JSON.stringify(DEFAULT_CONTACT));
+  }
+  function saveContact(d){ localStorage.setItem(CONTACT_KEY, JSON.stringify(d)); }
+  seedFromRemote(CONTACT_KEY, remoteContent && remoteContent.contact);
+  let contactData = loadContact();
+
+  const THEME_KEY = '1004house_promo_theme_v2';
+  const DEFAULT_THEME = { transitionType: 'fade', transitionSpeed: 1.4 };
+  function loadTheme(){
+    try{
+      const raw = localStorage.getItem(THEME_KEY);
+      if(raw) return Object.assign({}, DEFAULT_THEME, JSON.parse(raw));
+    }catch(e){}
+    return Object.assign({}, DEFAULT_THEME);
+  }
+  function saveTheme(t){ localStorage.setItem(THEME_KEY, JSON.stringify(t)); }
+  seedFromRemote(THEME_KEY, remoteContent && remoteContent.theme);
+  function applyTheme(t){
+    stage.classList.remove('t-fade','t-slide','t-zoom','t-cut');
+    stage.classList.add('t-' + (t.transitionType||'fade'));
+    stage.style.setProperty('--tspeed', (t.transitionSpeed||1.4) + 's');
+  }
+  let theme = loadTheme();
+
+  const DECK_KEY = '1004house_promo_deck_v1';
+  function defaultDeckOrder(){ return ['intro', ...slidesData.map(s=>s.id), 'services', 'contact']; }
+  function sanitizeDeck(deck){
+    const validIds = new Set(slidesData.map(s=>s.id));
+    const fixed = new Set(['intro','services','contact']);
+    let cleaned = (deck||[]).filter(tok => fixed.has(tok) || validIds.has(tok));
+    ['intro','services','contact'].forEach(tok=>{ if(!cleaned.includes(tok)) cleaned.push(tok); });
+    slidesData.forEach(s=>{
+      if(!cleaned.includes(s.id)){
+        let idx = cleaned.indexOf('services');
+        if(idx===-1) idx = cleaned.indexOf('contact');
+        if(idx===-1) cleaned.push(s.id); else cleaned.splice(idx,0,s.id);
+      }
+    });
+    return cleaned;
+  }
+  function loadDeck(){
+    try{
+      const raw = localStorage.getItem(DECK_KEY);
+      if(raw) return sanitizeDeck(JSON.parse(raw));
+    }catch(e){}
+    return defaultDeckOrder();
+  }
+  function saveDeck(d){ localStorage.setItem(DECK_KEY, JSON.stringify(d)); }
+  seedFromRemote(DECK_KEY, remoteContent && remoteContent.deck);
+  let deckOrder = loadDeck();
+
+  function insertNewPhotoToken(id){
+    let lastPhotoIdx = -1;
+    for(let i=0;i<deckOrder.length;i++){ if(!['intro','services','contact'].includes(deckOrder[i])) lastPhotoIdx = i; }
+    if(lastPhotoIdx >= 0){ deckOrder.splice(lastPhotoIdx+1, 0, id); return; }
+    let idx = deckOrder.indexOf('services');
+    if(idx===-1) idx = deckOrder.indexOf('contact');
+    if(idx===-1) deckOrder.push(id); else deckOrder.splice(idx,0,id);
+  }
+
+  function escapeHtml(str){
+    return (str||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(str){ return escapeHtml(str).replace(/'/g,'&#39;'); }
+
+  /* ---------------- 재생 화면 ---------------- */
+  const stage = document.getElementById('stage');
+  applyTheme(theme);
+  const dynamicSlot = document.getElementById('dynamicSlot');
+  const dotsWrap = document.getElementById('dots');
+  let order = [];
+  let idx = 0, timer = null, paused = false;
+
+  function applyPosition(slideEl, captionEl, pos){
+    const [vert, horiz] = (pos||'bottom-left').split('-');
+    slideEl.style.justifyContent = vert==='top' ? 'flex-start' : vert==='middle' ? 'center' : 'flex-end';
+    captionEl.style.textAlign = horiz;
+    captionEl.querySelectorAll('.tag, h2, p').forEach(el=>{
+      if(horiz==='left'){ el.style.marginLeft='0'; el.style.marginRight='auto'; }
+      else if(horiz==='right'){ el.style.marginLeft='auto'; el.style.marginRight='0'; }
+      else { el.style.marginLeft='auto'; el.style.marginRight='auto'; }
+    });
+  }
+
+  function applyPanelBg(el, data){
+    el.style.setProperty('--panelColor', data.bgColor || '#12313f');
+    const bg = el.querySelector('.bg');
+    if(data.bgType === 'photo' && data.bgImg){
+      bg.style.backgroundImage = `url('${data.bgImg}')`;
+      el.classList.add('has-photo');
+    } else {
+      bg.style.backgroundImage = '';
+      el.classList.remove('has-photo');
+    }
+  }
+
+  function applyPanelPosition(slideEl, innerEl, pos){
+    const [vert, horiz] = (pos||'middle-center').split('-');
+    slideEl.style.justifyContent = vert==='top' ? 'flex-start' : vert==='bottom' ? 'flex-end' : 'center';
+    slideEl.style.alignItems = horiz==='left' ? 'flex-start' : horiz==='right' ? 'flex-end' : 'center';
+    innerEl.style.textAlign = horiz==='left' ? 'left' : horiz==='right' ? 'right' : 'center';
+  }
+
+  function renderIntroDom(){
+    const el = stage.querySelector('[data-fixed="intro"]');
+    el.dataset.dur = (introData.dur||6) * 1000;
+    applyPanelBg(el, introData);
+    const inner = document.getElementById('introInner');
+    applyPanelPosition(el, inner, introData.position);
+    const ls = introData.lineSpacing || 1;
+    const titleHtml = (introData.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
+    inner.innerHTML = `
+      <div class="eyebrow" style="line-height:${1.3*ls};">${escapeHtml(introData.eyebrow||'')}</div>
+      <h1 style="line-height:${1.45*ls};">${titleHtml}</h1>
+      <div class="sub" style="line-height:${1.5*ls};">${escapeHtml(introData.sub||'')}</div>
+    `;
+  }
+
+  function renderServicesDom(){
+    const el = stage.querySelector('[data-fixed="services"]');
+    el.dataset.dur = (servicesData.dur||8) * 1000;
+    applyPanelBg(el, servicesData);
+    const inner = document.getElementById('servicesInner');
+    applyPanelPosition(el, inner, servicesData.position);
+    const ls = servicesData.lineSpacing || 1;
+    const titleHtml = (servicesData.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
+    const cardsHtml = (servicesData.cards||[]).map(c=>`
+      <div class="card"><div class="num">${escapeHtml(c.num||'')}</div><div class="name">${escapeHtml(c.name||'')}</div><div class="desc">${escapeHtml(c.desc||'')}</div></div>
+    `).join('');
+    inner.innerHTML = `
+      <div class="eyebrow" style="line-height:${1.3*ls};">${escapeHtml(servicesData.eyebrow||'')}</div>
+      <h1 style="font-size:2.5vw;line-height:${1.45*ls};">${titleHtml}</h1>
+      <div class="grid5" style="margin-top:4vh;">${cardsHtml}</div>
+    `;
+  }
+
+  function renderContactDom(){
+    const el = stage.querySelector('[data-fixed="contact"]');
+    el.dataset.dur = (contactData.dur||7) * 1000;
+    applyPanelBg(el, contactData);
+    const inner = document.getElementById('contactInner');
+    applyPanelPosition(el, inner, contactData.position);
+    const ls = contactData.lineSpacing || 1;
+    const titleHtml = (contactData.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
+    const itemsHtml = (contactData.items||[]).map(s=>`<span>${escapeHtml(s)}</span>`).join('');
+    inner.innerHTML = `
+      <div class="eyebrow" style="line-height:${1.3*ls};">${escapeHtml(contactData.eyebrow||'')}</div>
+      <h1 style="line-height:${1.45*ls};">${titleHtml}</h1>
+      <div class="contact-line">${itemsHtml}</div>
+    `;
+  }
+
+  function buildPlaybackDom(){
+    deckOrder = sanitizeDeck(deckOrder);
+    renderIntroDom();
+    renderServicesDom();
+    renderContactDom();
+
+    dynamicSlot.innerHTML = '';
+    const photoElMap = {};
+    slidesData.forEach((s)=>{
+      const st = getStyle(s);
+      const el = document.createElement('div');
+      el.className = 'slide photo';
+      el.dataset.dur = (s.dur||6)*1000;
+      const titleHtml = (s.title||'').split('\n').map(l=>escapeHtml(l)).join('<br>');
+      el.innerHTML = `
+        <div class="bg" style="background-image:url('${escapeAttr(s.img||'')}')"></div>
+        <div class="caption">
+          ${s.tag ? `<div class="tag" style="color:${st.tagColor};font-size:${st.tagSize}vw;line-height:${1.3*st.lineSpacing};">${escapeHtml(s.tag)}</div>` : ''}
+          <h2 style="color:${st.titleColor};font-size:${st.titleSize}vw;line-height:${1.35*st.lineSpacing};">${titleHtml}</h2>
+          ${s.desc ? `<p style="color:${st.descColor};font-size:${st.descSize}vw;line-height:${1.5*st.lineSpacing};">${escapeHtml(s.desc)}</p>` : ''}
+        </div>`;
+      dynamicSlot.appendChild(el);
+      applyPosition(el, el.querySelector('.caption'), st.position);
+      photoElMap[s.id] = el;
+    });
+
+    const introEl = stage.querySelector('[data-fixed="intro"]');
+    const servicesEl = stage.querySelector('[data-fixed="services"]');
+    const contactEl = stage.querySelector('[data-fixed="contact"]');
+    const lookup = { intro: introEl, services: servicesEl, contact: contactEl };
+    order = deckOrder.map(tok => lookup[tok] || photoElMap[tok]).filter(Boolean);
+
+    dotsWrap.innerHTML = '';
+    order.forEach(()=>{
+      const d = document.createElement('div');
+      d.className = 'dot';
+      d.innerHTML = '<div class="fill"></div>';
+      dotsWrap.appendChild(d);
+    });
+    idx = 0;
+    show(0);
+    schedule();
+  }
+
+  function show(i){
+    order.forEach((s,n)=> s.classList.toggle('active', n===i));
+    const dots = dotsWrap.querySelectorAll('.dot');
+    dots.forEach((d,n)=>{
+      d.classList.toggle('done', n<i);
+      d.classList.toggle('current', n===i);
+      const fill = d.querySelector('.fill');
+      fill.style.animation = 'none';
+      void fill.offsetWidth;
+      if(n===i){
+        const dur = order[i].dataset.dur || 6000;
+        d.style.setProperty('--dur', (dur/1000)+'s');
+        fill.style.animation = `fillbar linear forwards`;
+        fill.style.animationDuration = (dur/1000)+'s';
+      }
+    });
+  }
+  function next(){ idx = (idx+1) % order.length; show(idx); schedule(); }
+  function schedule(){
+    clearTimeout(timer);
+    if(paused) return;
+    const dur = parseInt(order[idx].dataset.dur || 6000, 10);
+    timer = setTimeout(next, dur);
+  }
+
+  const playPauseBtn = document.getElementById('playPauseBtn');
+  function updatePlayPauseIcon(){ playPauseBtn.textContent = paused ? '▶' : '⏸'; }
+  function togglePlay(){
+    paused = !paused;
+    document.body.style.filter = paused ? 'brightness(0.88)' : 'none';
+    if(!paused) schedule(); else clearTimeout(timer);
+    updatePlayPauseIcon();
+  }
+  document.getElementById('tapzone').addEventListener('click', togglePlay);
+  playPauseBtn.addEventListener('click', togglePlay);
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.addEventListener('click', (e)=>{ e.stopPropagation(); next(); });
+
+  /* ---------------- 편집 UI ---------------- */
+  const editor = document.getElementById('editor');
+  const deckList = document.getElementById('deckList');
+  const editToggle = document.getElementById('editToggle');
+  const closeEditor = document.getElementById('closeEditor');
+
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'), 1600);
+  }
+
+  const themeTransType = document.getElementById('themeTransType');
+  const themeTransSpeed = document.getElementById('themeTransSpeed');
+  themeTransType.value = theme.transitionType;
+  themeTransSpeed.value = theme.transitionSpeed;
+  themeTransType.addEventListener('input', ()=>{ theme.transitionType = themeTransType.value; saveTheme(theme); applyTheme(theme); });
+  themeTransSpeed.addEventListener('input', ()=>{ theme.transitionSpeed = Number(themeTransSpeed.value)||1.4; saveTheme(theme); applyTheme(theme); });
+
+  const POSITIONS = [
+    ['top-left','위쪽·왼쪽'], ['top-center','위쪽·가운데'], ['top-right','위쪽·오른쪽'],
+    ['middle-left','가운데·왼쪽'], ['middle-center','가운데·가운데'], ['middle-right','가운데·오른쪽'],
+    ['bottom-left','아래쪽·왼쪽(기본)'], ['bottom-center','아래쪽·가운데'], ['bottom-right','아래쪽·오른쪽']
+  ];
+
+  function persistAll(silent){
+    saveSlides(slidesData);
+    saveIntro(introData);
+    saveServices(servicesData);
+    saveContact(contactData);
+    deckOrder = sanitizeDeck(deckOrder);
+    saveDeck(deckOrder);
+    renderDeckEditor();
+    buildPlaybackDom();
+    if(!silent) toast('저장됐어요');
+  }
+
+  function moveDeck(i, dir){
+    const j = i + dir;
+    if(j<0 || j>=deckOrder.length) return;
+    [deckOrder[i], deckOrder[j]] = [deckOrder[j], deckOrder[i]];
+    persistAll();
+  }
+
+  function typeLabel(type){
+    return type==='intro' ? '인트로 화면' : type==='services' ? '서비스 안내 화면' : type==='contact' ? '후원/연락처 화면' : '사진 슬라이드';
+  }
+
+  function posFieldHtml(data){
+    return `
+      <div class="subhead">글자 위치</div>
+      <div>
+        <select data-pf="position">
+          ${POSITIONS.map(([v,label])=>`<option value="${v}" ${(data.position||'middle-center')===v?'selected':''}>${label}</option>`).join('')}
+        </select>
+      </div>
+    `;
+  }
+  function bindPosField(container, data, persistFn){
+    const sel = container.querySelector('[data-pf="position"]');
+    if(sel) sel.addEventListener('input', ()=>{ data.position = sel.value; persistFn(true); });
+  }
+
+  function lineSpacingFieldHtml(data){
+    return `
+      <div class="subhead">줄 간격</div>
+      <div><input type="number" data-lf="lineSpacing" min="0.8" max="2.2" step="0.1" value="${data.lineSpacing||1}"></div>
+    `;
+  }
+  function bindLineSpacingField(container, data, persistFn){
+    const inp = container.querySelector('[data-lf="lineSpacing"]');
+    if(inp) inp.addEventListener('input', ()=>{ data.lineSpacing = Number(inp.value)||1; persistFn(true); });
+  }
+
+  function bgFieldsHtml(data){
+    return `
+      <div class="subhead">배경</div>
+      <div class="row2">
+        <div>
+          <label>배경 유형</label>
+          <select data-bf="bgType">
+            <option value="color" ${data.bgType!=='photo'?'selected':''}>단색 배경</option>
+            <option value="photo" ${data.bgType==='photo'?'selected':''}>사진 배경</option>
+          </select>
+        </div>
+        <div><label>배경색</label><input type="color" data-bf="bgColor" value="${data.bgColor||'#12313f'}"></div>
+      </div>
+      <div><label>배경 사진 주소(URL)</label><input type="text" data-bf="bgImg" value="${escapeAttr(data.bgImg||'')}" placeholder="https://... 또는 파일 선택 이용"></div>
+      <div class="filepick"><input type="file" accept="image/*" data-bf="bgFile"></div>
+    `;
+  }
+  function bindBgFields(container, data, persistFn){
+    container.querySelectorAll('[data-bf]').forEach(inp=>{
+      const f = inp.dataset.bf;
+      if(f==='bgFile'){
+        inp.addEventListener('change', (e)=>{
+          const file = e.target.files[0];
+          if(!file) return;
+          const reader = new FileReader();
+          reader.onload = ()=>{ data.bgImg = reader.result; data.bgType = 'photo'; persistFn(); };
+          reader.readAsDataURL(file);
+        });
+      } else {
+        inp.addEventListener('input', ()=>{
+          data[f] = inp.value;
+          persistFn(true);
+        });
+      }
+    });
+  }
+
+  function renderDeckEditor(){
+    deckList.innerHTML = '';
+    deckOrder.forEach((tok, i)=>{
+      let type, slide = null;
+      if(tok==='intro') type='intro';
+      else if(tok==='services') type='services';
+      else if(tok==='contact') type='contact';
+      else { type='photo'; slide = slidesData.find(s=>s.id===tok); if(!slide) return; }
+
+      const card = document.createElement('div');
+      card.className = 'card-ed';
+      card.style.flexDirection = 'column';
+      card.style.alignItems = 'stretch';
+
+      const header = document.createElement('div');
+      header.style.display = 'flex';
+      header.style.justifyContent = 'space-between';
+      header.style.alignItems = 'center';
+      header.innerHTML = `
+        <span class="deck-badge">${i+1}번째 · ${typeLabel(type)}</span>
+        <div class="side-btns" style="flex-direction:row;">
+          <button class="btn small ghost" data-act="up">↑</button>
+          <button class="btn small ghost" data-act="down">↓</button>
+          ${type==='photo' ? '<button class="btn small danger" data-act="del">삭제</button>' : ''}
+        </div>
+      `;
+      header.querySelector('[data-act="up"]').addEventListener('click', ()=> moveDeck(i,-1));
+      header.querySelector('[data-act="down"]').addEventListener('click', ()=> moveDeck(i,1));
+      if(type==='photo'){
+        header.querySelector('[data-act="del"]').addEventListener('click', ()=>{
+          if(confirm('이 슬라이드를 삭제할까요?')){
+            slidesData = slidesData.filter(s=>s.id!==tok);
+            deckOrder = deckOrder.filter(t=>t!==tok);
+            persistAll();
+          }
+        });
+      }
+      card.appendChild(header);
+
+      const body = document.createElement('div');
+      body.style.marginTop = '10px';
+
+      if(type==='intro'){
+        body.innerHTML = `
+          <div class="row2">
+            <div><label>라벨(작은 안내문구)</label><input type="text" data-f="eyebrow" value="${escapeAttr(introData.eyebrow||'')}"></div>
+            <div><label>노출 시간(초)</label><input type="number" data-f="dur" min="2" max="60" value="${introData.dur||6}"></div>
+          </div>
+          <div><label>제목 (줄바꿈은 그대로 반영돼요)</label><textarea data-f="title" rows="2">${escapeHtml(introData.title||'')}</textarea></div>
+          <div><label>부제(작은 설명 문장)</label><textarea data-f="sub" rows="2">${escapeHtml(introData.sub||'')}</textarea></div>
+          ${posFieldHtml(introData)}
+          ${lineSpacingFieldHtml(introData)}
+          ${bgFieldsHtml(introData)}
+        `;
+        body.querySelectorAll('[data-f]').forEach(inp=>{
+          const f = inp.dataset.f;
+          inp.addEventListener('input', ()=>{ introData[f] = f==='dur' ? (Number(inp.value)||6) : inp.value; saveIntro(introData); });
+          inp.addEventListener('blur', ()=> persistAll(true));
+        });
+        bindPosField(body, introData, persistAll);
+        bindLineSpacingField(body, introData, persistAll);
+        bindBgFields(body, introData, persistAll);
+      }
+
+      else if(type==='services'){
+        body.innerHTML = `
+          <div class="row2">
+            <div><label>라벨(작은 안내문구)</label><input type="text" data-f="eyebrow" value="${escapeAttr(servicesData.eyebrow||'')}"></div>
+            <div><label>노출 시간(초)</label><input type="number" data-f="dur" min="2" max="60" value="${servicesData.dur||8}"></div>
+          </div>
+          <div><label>제목 (줄바꿈은 그대로 반영돼요)</label><textarea data-f="title" rows="2">${escapeHtml(servicesData.title||'')}</textarea></div>
+          <div id="svcCards_${i}" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
+          <button class="btn small ghost" data-act="addCard" style="margin-top:10px; width:fit-content;">+ 카드 추가</button>
+          ${posFieldHtml(servicesData)}
+          ${lineSpacingFieldHtml(servicesData)}
+          ${bgFieldsHtml(servicesData)}
+        `;
+        body.querySelectorAll('[data-f]').forEach(inp=>{
+          const f = inp.dataset.f;
+          inp.addEventListener('input', ()=>{ servicesData[f] = f==='dur' ? (Number(inp.value)||8) : inp.value; saveServices(servicesData); });
+          inp.addEventListener('blur', ()=> persistAll(true));
+        });
+        bindPosField(body, servicesData, persistAll);
+        bindLineSpacingField(body, servicesData, persistAll);
+        bindBgFields(body, servicesData, persistAll);
+        const cardsWrap = body.querySelector(`#svcCards_${i}`);
+        (servicesData.cards||[]).forEach((c, ci)=>{
+          const row = document.createElement('div');
+          row.className = 'style-row';
+          row.style.alignItems = 'flex-end';
+          row.innerHTML = `
+            <div style="flex:0 0 60px;"><label>번호</label><input type="text" data-cf="num" value="${escapeAttr(c.num||'')}"></div>
+            <div><label>팀 이름</label><input type="text" data-cf="name" value="${escapeAttr(c.name||'')}"></div>
+            <div style="flex:2;"><label>설명</label><input type="text" data-cf="desc" value="${escapeAttr(c.desc||'')}"></div>
+            <button class="btn small danger" data-cact="del">삭제</button>
+          `;
+          row.querySelectorAll('[data-cf]').forEach(inp=>{
+            const f = inp.dataset.cf;
+            inp.addEventListener('input', ()=>{ servicesData.cards[ci][f] = inp.value; saveServices(servicesData); });
+            inp.addEventListener('blur', ()=> persistAll(true));
+          });
+          row.querySelector('[data-cact="del"]').addEventListener('click', ()=>{
+            servicesData.cards.splice(ci,1); persistAll();
+          });
+          cardsWrap.appendChild(row);
+        });
+        body.querySelector('[data-act="addCard"]').addEventListener('click', ()=>{
+          servicesData.cards = servicesData.cards || [];
+          const n = String(servicesData.cards.length+1).padStart(2,'0');
+          servicesData.cards.push({num:n, name:'새 팀', desc:''});
+          persistAll();
+        });
+      }
+
+      else if(type==='contact'){
+        body.innerHTML = `
+          <div class="row2">
+            <div><label>라벨(작은 안내문구)</label><input type="text" data-f="eyebrow" value="${escapeAttr(contactData.eyebrow||'')}"></div>
+            <div><label>노출 시간(초)</label><input type="number" data-f="dur" min="2" max="60" value="${contactData.dur||7}"></div>
+          </div>
+          <div><label>제목 (줄바꿈은 그대로 반영돼요)</label><textarea data-f="title" rows="2">${escapeHtml(contactData.title||'')}</textarea></div>
+          <div id="ctItems_${i}" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;"></div>
+          <button class="btn small ghost" data-act="addItem" style="margin-top:10px; width:fit-content;">+ 항목 추가</button>
+          ${posFieldHtml(contactData)}
+          ${lineSpacingFieldHtml(contactData)}
+          ${bgFieldsHtml(contactData)}
+        `;
+        body.querySelectorAll('[data-f]').forEach(inp=>{
+          const f = inp.dataset.f;
+          inp.addEventListener('input', ()=>{ contactData[f] = f==='dur' ? (Number(inp.value)||7) : inp.value; saveContact(contactData); });
+          inp.addEventListener('blur', ()=> persistAll(true));
+        });
+        bindPosField(body, contactData, persistAll);
+        bindLineSpacingField(body, contactData, persistAll);
+        bindBgFields(body, contactData, persistAll);
+        const itemsWrap = body.querySelector(`#ctItems_${i}`);
+        (contactData.items||[]).forEach((v, vi)=>{
+          const row = document.createElement('div');
+          row.className = 'style-row';
+          row.style.alignItems = 'flex-end';
+          row.innerHTML = `
+            <div style="flex:1;"><label>항목 ${vi+1}</label><input type="text" data-cf="val" value="${escapeAttr(v)}"></div>
+            <button class="btn small danger" data-cact="del">삭제</button>
+          `;
+          const inp = row.querySelector('[data-cf]');
+          inp.addEventListener('input', ()=>{ contactData.items[vi] = inp.value; saveContact(contactData); });
+          inp.addEventListener('blur', ()=> persistAll(true));
+          row.querySelector('[data-cact="del"]').addEventListener('click', ()=>{
+            contactData.items.splice(vi,1); persistAll();
+          });
+          itemsWrap.appendChild(row);
+        });
+        body.querySelector('[data-act="addItem"]').addEventListener('click', ()=>{
+          contactData.items = contactData.items || [];
+          contactData.items.push('새 항목');
+          persistAll();
+        });
+      }
+
+      else if(type==='photo'){
+        const st = getStyle(slide);
+        body.innerHTML = `
+          <div style="display:flex; gap:16px;">
+            <div class="thumb" style="${slide.img ? `background-image:url('${escapeAttr(slide.img)}')` : ''}; flex-shrink:0;">
+              ${slide.img ? '' : '사진 없음'}
+            </div>
+            <div class="fields">
+              <div class="row2">
+                <div><label>태그(작은 라벨)</label><input type="text" data-f="tag" value="${escapeAttr(slide.tag||'')}" placeholder="예: 나들이 행사"></div>
+                <div><label>노출 시간(초)</label><input type="number" data-f="dur" min="2" max="30" value="${slide.dur||6}"></div>
+              </div>
+              <div><label>제목 (줄바꿈은 그대로 반영돼요)</label><textarea data-f="title" rows="2">${escapeHtml(slide.title||'')}</textarea></div>
+              <div><label>설명 (선택)</label><textarea data-f="desc" rows="2">${escapeHtml(slide.desc||'')}</textarea></div>
+              <div><label>이미지 주소(URL)</label><input type="text" data-f="img" value="${escapeAttr(slide.img||'')}" placeholder="https://... 또는 파일 선택 이용"></div>
+              <div class="filepick"><input type="file" accept="image/*" data-f="file"></div>
+
+              <div><label>글자 위치</label>
+                <select data-sf="position">
+                  ${POSITIONS.map(([v,label])=>`<option value="${v}" ${st.position===v?'selected':''}>${label}</option>`).join('')}
+                </select>
+              </div>
+              <div class="row2">
+                <div><label>줄 간격</label><input type="number" data-sf="lineSpacing" min="0.8" max="2.2" step="0.1" value="${st.lineSpacing}"></div>
+                <div></div>
+              </div>
+              <div class="style-row">
+                <div class="colorbox"><label>태그 색</label><input type="color" data-sf="tagColor" value="${st.tagColor}"></div>
+                <div><label>태그 크기</label><input type="number" data-sf="tagSize" min="0.6" max="3" step="0.1" value="${st.tagSize}"></div>
+              </div>
+              <div class="style-row">
+                <div class="colorbox"><label>제목 색</label><input type="color" data-sf="titleColor" value="${st.titleColor}"></div>
+                <div><label>제목 크기</label><input type="number" data-sf="titleSize" min="1.2" max="6" step="0.1" value="${st.titleSize}"></div>
+              </div>
+              <div class="style-row">
+                <div class="colorbox"><label>설명 색</label><input type="color" data-sf="descColor" value="${st.descColor}"></div>
+                <div><label>설명 크기</label><input type="number" data-sf="descSize" min="0.6" max="3" step="0.1" value="${st.descSize}"></div>
+              </div>
+            </div>
+          </div>
+        `;
+        body.querySelectorAll('[data-f]').forEach(inp=>{
+          const field = inp.dataset.f;
+          if(field==='file'){
+            inp.addEventListener('change', (e)=>{
+              const file = e.target.files[0];
+              if(!file) return;
+              const reader = new FileReader();
+              reader.onload = ()=>{ slide.img = reader.result; persistAll(); };
+              reader.readAsDataURL(file);
+            });
+          } else {
+            inp.addEventListener('input', ()=>{
+              slide[field] = field==='dur' ? (Number(inp.value)||6) : inp.value;
+              saveSlides(slidesData);
+            });
+            inp.addEventListener('blur', ()=> persistAll(true));
+          }
+        });
+        body.querySelectorAll('[data-sf]').forEach(inp=>{
+          const field = inp.dataset.sf;
+          inp.addEventListener('input', ()=>{
+            slide.style = getStyle(slide);
+            slide.style[field] = (field==='tagSize'||field==='titleSize'||field==='descSize'||field==='lineSpacing') ? (Number(inp.value)||1) : inp.value;
+            persistAll(true);
+          });
+        });
+      }
+
+      card.appendChild(body);
+      deckList.appendChild(card);
+    });
+  }
+
+  editToggle.addEventListener('click', ()=>{
+    editor.classList.add('open');
+    paused = true; clearTimeout(timer);
+    playPauseBtn.disabled = true; nextBtn.disabled = true;
+    updatePlayPauseIcon();
+    renderDeckEditor();
+  });
+  closeEditor.addEventListener('click', ()=>{
+    editor.classList.remove('open');
+    playPauseBtn.disabled = false; nextBtn.disabled = false;
+    paused = false; schedule();
+    updatePlayPauseIcon();
+  });
+
+  document.getElementById('addSlide').addEventListener('click', ()=>{
+    const id = uid();
+    slidesData.push({id, img:'', tag:'', title:'새 슬라이드 제목', desc:'', dur:6, style: Object.assign({}, DEFAULT_STYLE)});
+    insertNewPhotoToken(id);
+    persistAll();
+  });
+
+  document.getElementById('resetAll').addEventListener('click', ()=>{
+    if(confirm('편집한 내용을 모두 지우고 기본값으로 되돌릴까요? (순서·배경·전환효과·모든 화면 내용 포함)')){
+      slidesData = defaultSlides();
+      introData = JSON.parse(JSON.stringify(DEFAULT_INTRO));
+      servicesData = JSON.parse(JSON.stringify(DEFAULT_SERVICES));
+      contactData = JSON.parse(JSON.stringify(DEFAULT_CONTACT));
+      theme = Object.assign({}, DEFAULT_THEME);
+      deckOrder = defaultDeckOrder();
+      saveTheme(theme); applyTheme(theme);
+      themeTransType.value = theme.transitionType; themeTransSpeed.value = theme.transitionSpeed;
+      persistAll();
+    }
+  });
+
+  document.getElementById('exportJson').addEventListener('click', ()=>{
+    const backup = { slides: slidesData, intro: introData, services: servicesData, contact: contactData, theme: theme, deck: deckOrder };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'content.json';
+    a.click();
+    toast('content.json 다운로드됨 — data 폴더에 덮어쓰고 GitHub에 올리면 모두에게 반영돼요');
+  });
+
+  document.getElementById('importJson').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const parsed = JSON.parse(reader.result);
+        if(Array.isArray(parsed)){
+          slidesData = parsed;
+          slidesData.forEach(s=>{ if(!s.id) s.id = uid(); });
+          deckOrder = defaultDeckOrder();
+          persistAll();
+        } else if(parsed && typeof parsed === 'object'){
+          if(Array.isArray(parsed.slides)){
+            slidesData = parsed.slides;
+            slidesData.forEach(s=>{ if(!s.id) s.id = uid(); });
+          }
+          if(parsed.intro) introData = Object.assign({}, DEFAULT_INTRO, parsed.intro);
+          if(parsed.services) servicesData = Object.assign({}, DEFAULT_SERVICES, parsed.services);
+          if(parsed.contact) contactData = Object.assign({}, DEFAULT_CONTACT, parsed.contact);
+          if(parsed.theme){
+            theme = Object.assign({}, DEFAULT_THEME, parsed.theme); saveTheme(theme); applyTheme(theme);
+            themeTransType.value = theme.transitionType; themeTransSpeed.value = theme.transitionSpeed;
+          }
+          deckOrder = Array.isArray(parsed.deck) ? parsed.deck : defaultDeckOrder();
+          persistAll();
+        } else {
+          alert('올바른 백업 파일이 아니에요.');
+        }
+      }catch(err){ alert('파일을 읽을 수 없어요.'); }
+    };
+    reader.readAsText(file);
+  });
+
+  renderDeckEditor();
+  buildPlaybackDom();
+
+  /* ---------------- 동영상으로 다운로드 ---------------- */
+  const videoBtn = document.getElementById('videoDownload');
+  const vpModal = document.getElementById('videoProgress');
+  const vpCount = document.getElementById('vpCount');
+  const vpBar = document.getElementById('vpBar');
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+  function loadImageSafe(url){
+    return new Promise(resolve=>{
+      if(!url){ resolve(null); return; }
+      const img = new Image();
+      if(!url.startsWith('data:')) img.crossOrigin = 'anonymous';
+      img.onload = ()=> resolve(img);
+      img.onerror = ()=> resolve(null);
+      img.src = url;
+    });
+  }
+
+  function wrapLines(ctx, text, maxWidth){
+    const lines = []; let line = '';
+    for(const ch of String(text||'')){
+      if(ch === '\n'){ lines.push(line); line=''; continue; }
+      const test = line + ch;
+      if(ctx.measureText(test).width > maxWidth && line){ lines.push(line); line = ch; }
+      else line = test;
+    }
+    if(line) lines.push(line);
+    return lines;
+  }
+
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function drawCover(ctx, img, x,y,w,h){
+    const ir = img.width/img.height, r = w/h;
+    let sx,sy,sw,sh;
+    if(ir > r){ sh = img.height; sw = sh*r; sx=(img.width-sw)/2; sy=0; }
+    else { sw = img.width; sh = sw/r; sx=0; sy=(img.height-sh)/2; }
+    ctx.drawImage(img, sx,sy,sw,sh, x,y,w,h);
+  }
+
+  function drawPanelBackground(ctx,W,H,color,imgEl){
+    if(imgEl){
+      drawCover(ctx, imgEl, 0,0,W,H);
+      ctx.fillStyle = 'rgba(8,14,20,0.48)'; ctx.fillRect(0,0,W,H);
+      return;
+    }
+    ctx.fillStyle = '#0f1720'; ctx.fillRect(0,0,W,H);
+    const rg = ctx.createRadialGradient(W*0.3,H*0.2,0,W*0.3,H*0.2,Math.max(W,H)*0.65);
+    rg.addColorStop(0, color || '#12313f');
+    rg.addColorStop(1, '#0f1720');
+    ctx.fillStyle = rg; ctx.fillRect(0,0,W,H);
+    const hg = ctx.createRadialGradient(W*0.86,H*-0.05,0,W*0.86,H*-0.05,W*0.32);
+    hg.addColorStop(0,'rgba(255,255,255,0.10)');
+    hg.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = hg; ctx.fillRect(0,0,W,H);
+  }
+
+  function drawTextPanel(ctx,W,H,item){
+    drawPanelBackground(ctx,W,H,item.bgColor,item.imgEl);
+    const [vert,horiz] = (item.position||'middle-center').split('-');
+    const x = horiz==='left' ? 140 : horiz==='right' ? W-140 : W/2;
+    const align = horiz;
+
+    const ls = item.lineSpacing || 1;
+    const eyebrowLH=40*ls, titleLH=88*ls, subLH=42*ls;
+    ctx.font = '400 30px "Noto Sans KR", sans-serif';
+    let subLines = [];
+    (item.subLines||[]).forEach(s=>{ subLines = subLines.concat(wrapLines(ctx, s, W*0.66)); });
+    const titleLines = item.titleLines||[];
+    const blockHeight = (item.eyebrow?titleLH:0) + titleLines.length*titleLH + (subLines.length?(26+subLines.length*subLH):0);
+
+    const firstLH = item.eyebrow ? eyebrowLH : titleLH;
+    let startY;
+    if(vert==='top') startY = 170 + firstLH*0.6;
+    else if(vert==='bottom') startY = H - 90 - blockHeight + firstLH*0.6;
+    else startY = H/2 - blockHeight/2 + firstLH*0.6;
+
+    ctx.textAlign = align;
+    let cy = startY;
+    if(item.eyebrow){
+      ctx.fillStyle = '#5fd0dc'; ctx.font = '700 30px "Noto Sans KR", sans-serif';
+      ctx.fillText(item.eyebrow, x, cy);
+      cy += titleLH;
+    }
+    ctx.fillStyle = '#e9f4f6'; ctx.font = '700 74px "Noto Serif KR", serif';
+    titleLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += titleLH; });
+    if(subLines.length){
+      cy += 26;
+      ctx.fillStyle = '#d6ecf0'; ctx.font = '400 30px "Noto Sans KR", sans-serif';
+      subLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += subLH; });
+    }
+  }
+
+  function drawServicesSlide(ctx,W,H,item){
+    drawPanelBackground(ctx,W,H,item.bgColor,item.imgEl);
+    const [vert,horiz] = (item.position||'middle-center').split('-');
+    const x = horiz==='left' ? 140 : horiz==='right' ? W-140 : W/2;
+    const align = horiz;
+
+    const ls = item.lineSpacing || 1;
+    const eyebrowLH=34*ls, titleLH=60*ls;
+    const titleLines = item.titleLines||[];
+    const cards = item.cards||[];
+    const cardW=300, cardH=210, gap=26, n=cards.length || 1;
+    const totalW = n*cardW + (n-1)*gap;
+    const cardsBlockH = cardH + 40;
+    const textBlockH = (item.eyebrow?titleLH:0) + titleLines.length*titleLH;
+    const totalH = textBlockH + cardsBlockH;
+
+    const firstLH = item.eyebrow ? eyebrowLH : titleLH;
+    let startY;
+    if(vert==='top') startY = 140 + firstLH*0.7;
+    else if(vert==='bottom') startY = H - 60 - totalH + firstLH*0.7;
+    else startY = H/2 - totalH/2 + firstLH*0.7;
+
+    ctx.textAlign = align;
+    let cy = startY;
+    if(item.eyebrow){
+      ctx.fillStyle = '#5fd0dc'; ctx.font = '700 28px "Noto Sans KR", sans-serif';
+      ctx.fillText(item.eyebrow, x, cy);
+      cy += titleLH;
+    }
+    ctx.fillStyle = '#e9f4f6'; ctx.font = '700 50px "Noto Serif KR", serif';
+    titleLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += titleLH; });
+
+    cy += 40;
+    let cx = horiz==='left' ? 140 : horiz==='right' ? (W-140-totalW) : (W/2 - totalW/2);
+    cards.forEach(card=>{
+      ctx.fillStyle = 'rgba(255,255,255,0.10)';
+      roundRect(ctx,cx,cy,cardW,cardH,16); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.20)'; ctx.lineWidth=1;
+      roundRect(ctx,cx,cy,cardW,cardH,16); ctx.stroke();
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#5fd0dc'; ctx.font = '700 28px "Noto Serif KR", serif';
+      ctx.fillText(card.num||'', cx+24, cy+48);
+      ctx.fillStyle = '#e9f4f6'; ctx.font = '700 21px "Noto Sans KR", sans-serif';
+      ctx.fillText(card.name||'', cx+24, cy+82);
+      ctx.fillStyle = '#dcecef'; ctx.font = '400 16px "Noto Sans KR", sans-serif';
+      let ly = cy+112;
+      wrapLines(ctx, card.desc||'', cardW-48).forEach(line=>{ ctx.fillText(line, cx+24, ly); ly+=23; });
+      cx += cardW+gap;
+    });
+  }
+
+  function drawPhotoSlide(ctx,W,H,item){
+    const st = item.style || DEFAULT_STYLE;
+    if(item.imgEl){ drawCover(ctx, item.imgEl, 0,0,W,H); } else { drawPanelBackground(ctx,W,H,'#12313f'); }
+
+    ctx.fillStyle = 'rgba(8,14,20,0.16)'; ctx.fillRect(0,0,W,H);
+    const grad = ctx.createLinearGradient(0,H*0.45,0,H);
+    grad.addColorStop(0,'rgba(8,14,20,0)');
+    grad.addColorStop(1,'rgba(8,14,20,0.88)');
+    ctx.fillStyle = grad; ctx.fillRect(0,H*0.45,W,H*0.55);
+
+    const px = v => v * (W/100);
+    const ls = st.lineSpacing || 1;
+    const tagPx = px(st.tagSize), titlePx = px(st.titleSize), descPx = px(st.descSize);
+    const tagLH = tagPx*1.4*ls, titleLH = titlePx*1.22*ls, descLH = descPx*1.35*ls;
+
+    const titleLines = String(item.title||'').split('\n');
+    let descLines = [];
+    if(item.desc){
+      ctx.font = `400 ${descPx}px "Noto Sans KR", sans-serif`;
+      descLines = wrapLines(ctx, item.desc, W*0.55);
+    }
+
+    const blockHeight = (item.tag?titleLH:0) + titleLines.length*titleLH + (descLines.length ? (16+descLines.length*descLH) : 0);
+
+    const [vert,horiz] = (st.position||'bottom-left').split('-');
+    const x = horiz==='left' ? 100 : horiz==='right' ? W-100 : W/2;
+    const align = horiz;
+    const firstLH = item.tag ? tagLH : titleLH;
+    let startY;
+    if(vert==='top') startY = 170 + firstLH*0.75;
+    else if(vert==='middle') startY = H/2 - blockHeight/2 + firstLH*0.75;
+    else startY = H - 60 - blockHeight + firstLH*0.75;
+
+    ctx.textAlign = align;
+    let cy = startY;
+    if(item.tag){
+      ctx.fillStyle = st.tagColor; ctx.font = `700 ${tagPx}px "Noto Sans KR", sans-serif`;
+      ctx.fillText(item.tag, x, cy);
+      cy += titleLH;
+    }
+    ctx.fillStyle = st.titleColor; ctx.font = `700 ${titlePx}px "Noto Serif KR", serif`;
+    titleLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += titleLH; });
+    if(descLines.length){
+      cy += 16;
+      ctx.fillStyle = st.descColor; ctx.font = `400 ${descPx}px "Noto Sans KR", sans-serif`;
+      descLines.forEach(line=>{ ctx.fillText(line, x, cy); cy += descLH; });
+    }
+  }
+
+  function drawSlideFrame(ctx,W,H,item){
+    if(item.type === 'panel') drawTextPanel(ctx,W,H,item);
+    else if(item.type === 'services') drawServicesSlide(ctx,W,H,item);
+    else if(item.type === 'photo') drawPhotoSlide(ctx,W,H,item);
+  }
+
+  function buildRenderList(){
+    deckOrder = sanitizeDeck(deckOrder);
+    return deckOrder.map(tok=>{
+      if(tok==='intro'){
+        return {
+          type:'panel', bgColor: introData.bgColor, bgImgUrl: introData.bgType==='photo' ? introData.bgImg : '',
+          position: introData.position, lineSpacing: introData.lineSpacing||1,
+          eyebrow: introData.eyebrow||'', titleLines: (introData.title||'').split('\n'),
+          subLines: [introData.sub||''], durMs: (Number(introData.dur)||6)*1000
+        };
+      }
+      if(tok==='services'){
+        return {
+          type:'services', bgColor: servicesData.bgColor, bgImgUrl: servicesData.bgType==='photo' ? servicesData.bgImg : '',
+          position: servicesData.position, lineSpacing: servicesData.lineSpacing||1,
+          eyebrow: servicesData.eyebrow||'', titleLines: (servicesData.title||'').split('\n'),
+          cards: (servicesData.cards||[]).map(c=>({num:c.num||'', name:c.name||'', desc:c.desc||''})),
+          durMs: (Number(servicesData.dur)||8)*1000
+        };
+      }
+      if(tok==='contact'){
+        return {
+          type:'panel', bgColor: contactData.bgColor, bgImgUrl: contactData.bgType==='photo' ? contactData.bgImg : '',
+          position: contactData.position, lineSpacing: contactData.lineSpacing||1,
+          eyebrow: contactData.eyebrow||'', titleLines: (contactData.title||'').split('\n'),
+          subLines: [(contactData.items||[]).join('      ')], durMs: (Number(contactData.dur)||7)*1000
+        };
+      }
+      const s = slidesData.find(x=>x.id===tok);
+      if(!s) return null;
+      return {
+        type:'photo', img: s.img||'', tag: s.tag||'', title: s.title||'', desc: s.desc||'',
+        style: getStyle(s), durMs: (Number(s.dur)||6)*1000
+      };
+    }).filter(Boolean);
+  }
+
+  function pickMime(){
+    const opts = [
+      'video/mp4;codecs=avc1.42E01E',
+      'video/mp4',
+      'video/webm;codecs=vp8',
+      'video/webm;codecs=vp9',
+      'video/webm'
+    ];
+    for(const o of opts){ if(window.MediaRecorder && MediaRecorder.isTypeSupported(o)) return o; }
+    return '';
+  }
+
+  async function recordVideo(){
+    if(!('MediaRecorder' in window) || !HTMLCanvasElement.prototype.captureStream){
+      alert('이 브라우저에서는 동영상 다운로드 기능을 지원하지 않아요. 최신 크롬(Chrome) 브라우저에서 시도해 주세요.');
+      return;
+    }
+    videoBtn.disabled = true;
+    playPauseBtn.disabled = true; nextBtn.disabled = true;
+    paused = true; clearTimeout(timer);
+    updatePlayPauseIcon();
+    vpModal.style.display = 'flex';
+    vpBar.style.width = '0%';
+    vpCount.textContent = '';
+
+    try{
+      await document.fonts.ready;
+
+      const W=1920, H=1080;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      const renderList = buildRenderList();
+
+      const failed = [];
+      for(const item of renderList){
+        const url = item.type==='photo' ? item.img : item.bgImgUrl;
+        if(url){
+          item.imgEl = await loadImageSafe(url);
+          if(!item.imgEl) failed.push((item.title||item.titleLines&&item.titleLines[0]||'사진').toString().split('\n')[0]);
+        }
+      }
+
+      const mimeType = pickMime();
+      const stream = canvas.captureStream(30);
+      const recorder = new MediaRecorder(stream, mimeType ? {mimeType, videoBitsPerSecond:6000000} : undefined);
+      const chunks = [];
+      recorder.ondataavailable = e=>{ if(e.data && e.data.size) chunks.push(e.data); };
+      const stopped = new Promise(res=> recorder.onstop = res);
+      recorder.start(500);
+
+      const total = renderList.reduce((a,b)=>a+b.durMs,0);
+      let elapsed = 0;
+      for(let i=0;i<renderList.length;i++){
+        const item = renderList[i];
+        vpCount.textContent = `${i+1} / ${renderList.length}`;
+        vpBar.style.width = Math.round((elapsed/total)*100) + '%';
+        drawSlideFrame(ctx, W, H, item);
+        await sleep(item.durMs);
+        elapsed += item.durMs;
+      }
+      vpBar.style.width = '100%';
+      recorder.stop();
+      await stopped;
+
+      const blob = new Blob(chunks, {type: mimeType || 'video/webm'});
+      const url = URL.createObjectURL(blob);
+      const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      const a = document.createElement('a');
+      a.href = url; a.download = '1004보금자리_홍보영상.' + ext;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 4000);
+
+      if(failed.length){
+        toast(`영상은 저장됐어요(.${ext}). 다만 외부 주소 사진 ${failed.length}장은 보안정책상 빠졌어요 — 파일 업로드로 바꿔보세요.`);
+      } else {
+        toast(`영상 파일(.${ext}) 다운로드가 시작됐어요!`);
+      }
+    } catch(err){
+      alert('영상 제작 중 문제가 발생했어요: ' + err.message);
+    } finally {
+      vpModal.style.display = 'none';
+      videoBtn.disabled = false;
+      playPauseBtn.disabled = false; nextBtn.disabled = false;
+      paused = false; schedule();
+      updatePlayPauseIcon();
+    }
+  }
+
+  videoBtn.addEventListener('click', recordVideo);
+
+})();
+</script>
+
+</body>
+</html>

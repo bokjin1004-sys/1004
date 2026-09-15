@@ -1,0 +1,72 @@
+{
+  "slides": [
+    {
+      "id": "p1",
+      "img": "http://1004house.co.kr/theme/sh/html/image/main_visual01.jpg",
+      "tag": "일상 속 동행",
+      "title": "맞잡은 두 손으로 전해지는 온기,\n함께 걷는 눈부신 동행",
+      "desc": "",
+      "dur": 6,
+      "style": { "position": "bottom-left", "tagColor": "#5fd0dc", "tagSize": 1.3, "titleColor": "#e9f4f6", "titleSize": 2.9, "descColor": "#d6ecf0", "descSize": 1.25, "lineSpacing": 1 }
+    },
+    {
+      "id": "p2",
+      "img": "http://1004house.co.kr/theme/sh/html/image/main_visual02.jpg",
+      "tag": "작은 일상, 큰 행복",
+      "title": "작은 일상도 함께라면\n당연한 행복입니다",
+      "desc": "",
+      "dur": 6,
+      "style": { "position": "bottom-left", "tagColor": "#5fd0dc", "tagSize": 1.3, "titleColor": "#e9f4f6", "titleSize": 2.9, "descColor": "#d6ecf0", "descSize": 1.25, "lineSpacing": 1 }
+    },
+    {
+      "id": "p3",
+      "img": "http://1004house.co.kr/theme/sh/html/image/main_visual03.jpg",
+      "tag": "프로그램 & 행사",
+      "title": "거주인과 함께 만들어가는\n다양한 프로그램",
+      "desc": "이 사진들을 우리 시설의 실제 프로그램·행사 사진으로 바꿔보세요.",
+      "dur": 6,
+      "style": { "position": "bottom-left", "tagColor": "#5fd0dc", "tagSize": 1.3, "titleColor": "#e9f4f6", "titleSize": 2.9, "descColor": "#d6ecf0", "descSize": 1.25, "lineSpacing": 1 }
+    }
+  ],
+  "intro": {
+    "eyebrow": "전남 신안 · 1004보금자리",
+    "title": "함께 나누는 미소,\n같이 걸어가는 아름다운 동행",
+    "sub": "발달장애인의 존엄한 독립과 따뜻한 지역사회 동행을 지원합니다",
+    "dur": 6,
+    "bgType": "color",
+    "bgColor": "#12313f",
+    "bgImg": "",
+    "position": "middle-center",
+    "lineSpacing": 1
+  },
+  "services": {
+    "eyebrow": "서비스 안내",
+    "title": "거주인의 요구에 부합한\n다섯 가지 서비스",
+    "dur": 8,
+    "bgType": "color",
+    "bgColor": "#123b52",
+    "bgImg": "",
+    "position": "middle-center",
+    "lineSpacing": 1,
+    "cards": [
+      { "num": "01", "name": "서비스지원팀", "desc": "개별화·일상생활·문화여가·가족연계 지원" },
+      { "num": "02", "name": "건강지원팀", "desc": "정기 건강검진과 맞춤 치료 연계" },
+      { "num": "03", "name": "개별화지원팀", "desc": "교육·발달·사회심리·직업재활 지원" },
+      { "num": "04", "name": "영양/급식지원팀", "desc": "식습관과 선호를 고려한 급식 서비스" },
+      { "num": "05", "name": "행정지원팀", "desc": "시설 운영과 후원·자원봉사 관리" }
+    ]
+  },
+  "contact": {
+    "eyebrow": "후원 및 문의",
+    "title": "나눔을 실천하는\n당신이 아름답습니다",
+    "dur": 7,
+    "bgType": "color",
+    "bgColor": "#12313f",
+    "bgImg": "",
+    "position": "middle-center",
+    "lineSpacing": 1,
+    "items": ["☎ 061-275-0767", "전남 신안군 압해읍 구항길 92-76", "1004house.co.kr"]
+  },
+  "theme": { "transitionType": "fade", "transitionSpeed": 1.4 },
+  "deck": ["intro", "p1", "p2", "p3", "services", "contact"]
+}
