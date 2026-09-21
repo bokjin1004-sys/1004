@@ -696,10 +696,21 @@
 
   const playPauseBtn = document.getElementById('playPauseBtn');
   function updatePlayPauseIcon(){ playPauseBtn.textContent = paused ? '▶' : '⏸'; }
+  const AUTO_RESUME_MS = 30000;
+  let autoResumeTimer = null;
   function togglePlay(){
     paused = !paused;
     document.body.style.filter = paused ? 'brightness(0.88)' : 'none';
-    if(!paused) schedule(); else clearTimeout(timer);
+    clearTimeout(autoResumeTimer);
+    if(!paused){
+      schedule();
+    } else {
+      clearTimeout(timer);
+      // 실수로 화면을 건드려 멈춘 채로 방치되지 않도록, 편집 화면이 열려있지 않으면 잠시 후 자동으로 다시 재생한다.
+      autoResumeTimer = setTimeout(()=>{
+        if(paused && !editor.classList.contains('open')) togglePlay();
+      }, AUTO_RESUME_MS);
+    }
     updatePlayPauseIcon();
   }
   document.getElementById('tapzone').addEventListener('click', togglePlay);
